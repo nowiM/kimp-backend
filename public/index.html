@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upbit & Bybit WebSocket Data</title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      h1 {
+        text-align: center;
+      }
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .kimpTable {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+      .kimpTable .container {
+        max-width: 1200px;
+        width: 100%;
+      }
+      .kimpTable .container .table {
+        width: 100%; /* 추가된 부분 */
+        text-align: center;
+        table-layout: fixed; /* 추가된 부분 */
+      }
+      .kimpTable .container .table .tableHeader,
+      .kimpTable .container .table .tableBody {
+        width: 100%; /* 추가된 부분 */
+      }
+      .kimpTable .container .table .tableBody .rise {
+        color: red;
+      }
+      .kimpTable .container .table .tableBody .fall {
+        color: blue;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Real-time Upbit & Bybit Ticker Data</h1>
+
+    <div class="kimpTable">
+      <div class="container">
+        <table class="table">
+          <thead class="tableHeader">
+            <tr>
+              <th>코인</th>
+              <th>업비트(￦)</th>
+              <th>바이비트($)</th>
+              <th>등락(%)</th>
+              <th>52주 최저</th>
+              <th>거래량(억)</th>
+              <th>김프</th>
+            </tr>
+          </thead>
+          <tbody class="tableBody">
+            <!-- 김프 테이블 생성 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      const ws = new WebSocket(`ws://${location.host}`);
+      const exchangeRate = 1371.72; // 1 USD = 1358.96 KRW
+
+      const coinData = {};
+      function updatePremium(ticker) {
+        if (
+          coinData[ticker].upbitPrice !== null &&
+          coinData[ticker].bybitPrice !== null
+        ) {
+          // console.log("upbitPrice: " + coinData[ticker].upbitPrice);
+          // console.log("bybitPrice: " + coinData[ticker].bybitPrice);
+          const premium =
+            (coinData[ticker].upbitPrice /
+              (coinData[ticker].bybitPrice * exchangeRate)) *
+              100 -
+            100;
+          document.getElementById(
+            `premium-${ticker}`
+          ).textContent = `${premium.toFixed(2)}%`;
+        }
+      }
+
+      function createCoinElement(
+        ticker,
+        upbitPrice = "",
+        bybitPrice = "",
+        signedChangeRate = "",
+        lowest_52_week_price = "",
+        acc_trade_price_24h
+      ) {
+        const tr = document.createElement("tr");
+        tr.className = "coin";
+        tr.id = `coin-${ticker}`;
+        tr.innerHTML = `
+        <td>${ticker}</td>
+        <td id = "upbit-${ticker}">${upbitPrice}</td>
+        <td id = "bybit-${ticker}">${bybitPrice}</td>
+        <td id = "signed-change-rate_${ticker}">${signedChangeRate}</td>
+        <td id = "lowest_52_week_price_${ticker}">${lowest_52_week_price}</td>
+        <td id = "acc_trade_price_24h_${ticker}">${acc_trade_price_24h}</td>
+        <td id = "premium-${ticker}"></td>
+      `;
+        document.querySelector(".tableBody").appendChild(tr);
+      }
+
+      ws.onopen = () => {
+        console.log("Connected to server WebSocket");
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          //console.log("Received message:", message);
+          const {
+            source,
+            ticker,
+            price,
+            signedChangeRate,
+            lowest_52_week_price,
+            acc_trade_price_24h,
+          } = message; //거래소, 코인심볼, 가격, 부호가 있는 변화율
+          if (!coinData[ticker]) {
+            coinData[ticker] = {
+              upbitPrice: null,
+              bybitPrice: null,
+              signedChangeRate: null,
+            };
+            createCoinElement(ticker);
+          }
+
+          if (source === "upbit") {
+            coinData[ticker].upbitPrice = price;
+            coinData[ticker].lowest_52_week_price = lowest_52_week_price;
+            coinData[ticker].acc_trade_price_24h = acc_trade_price_24h;
+            document.getElementById(`upbit-${ticker}`).textContent = `${price}`;
+            if (signedChangeRate > 0) {
+              //상승
+              document
+                .querySelector(`#signed-change-rate_${ticker}`)
+                .classList.add("rise");
+
+              document.getElementById(
+                `signed-change-rate_${ticker}`
+              ).textContent = `+${(signedChangeRate * 100).toFixed(2)}%`;
+            } else {
+              //하락
+              document
+                .querySelector(`#signed-change-rate_${ticker}`)
+                .classList.add("fall");
+
+              document.getElementById(
+                `signed-change-rate_${ticker}`
+              ).textContent = `${(signedChangeRate * 100).toFixed(2)}%`;
+            }
+
+            document.getElementById(
+              `lowest_52_week_price_${ticker}`
+            ).textContent = `${lowest_52_week_price}`;
+
+            document.getElementById(
+              `acc_trade_price_24h_${ticker}`
+            ).textContent = `${acc_trade_price_24h}`;
+          } else if (source === "bybit") {
+            coinData[ticker].bybitPrice = price;
+            document.getElementById(`bybit-${ticker}`).textContent = `${price}`;
+          }
+          updatePremium(ticker);
+        } catch (error) {
+          console.error("Error parsing JSON:", error);
+        }
+      };
+
+      ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+      };
+
+      ws.onclose = () => {
+        console.log("WebSocket connection closed");
+      };
+
+      console.log(coinData);
+    </script>
+  </body>
+</html>
