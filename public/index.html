@@ -90,10 +90,30 @@
 
     <script>
       const ws = new WebSocket(`ws://${location.host}`);
-      const exchangeRate = 1370.73; // 1 USD = 1358.96 KRW
+      // const exchangeRate = 1370.86; // 1 USD = 1358.96 KRW
+      let exchangeRate = null; // 1 USD = 1358.96 KRW
 
       const coinData = {};
+
+      const fetchExchangeRate = async () => {
+        const exchangeRateUrl =
+          "https://currency-api.pages.dev/v1/currencies/usd.json";
+        try {
+          const response = await fetch(exchangeRateUrl);
+          const data = await response.json();
+          exchangeRate = data.usd.krw;
+        } catch (error) {
+          console.log("Error!! fetchExchangeRate function ->", error);
+          return;
+        }
+      };
+
+      fetchExchangeRate();
+
+      console.log(exchangeRate);
+
       function updatePremium(ticker) {
+        console.log(exchangeRate);
         if (
           coinData[ticker].upbitPrice !== null &&
           coinData[ticker].bybitPrice !== null
@@ -110,14 +130,37 @@
           if (premiumRate > 0) {
             //김프
             document.querySelector(`#premium-${ticker}`).className = "kimp";
-
-            if (premiuValue >= 1) {
+            //console.log(premiuValue);
+            if (premiuValue >= 1000) {
+              // 1000 이상일 때 소수점 X
               document.getElementById(
                 `premium-${ticker}`
               ).textContent = `${Number(
                 premiuValue.toFixed(0)
               ).toLocaleString()} (${premiumRate.toFixed(2)}%)`;
-            } else {
+            } else if (premiuValue >= 100) {
+              // 100 이상일 때 소수점 한자리만 표현
+              document.getElementById(
+                `premium-${ticker}`
+              ).textContent = `${premiuValue.toFixed(1)} (${premiumRate.toFixed(
+                2
+              )}%)`;
+            } else if (premiuValue >= 10) {
+              // 10 이상일 때 소수점 두 자리만 표현
+              document.getElementById(
+                `premium-${ticker}`
+              ).textContent = `${premiuValue.toFixed(2)} (${premiumRate.toFixed(
+                2
+              )}%)`;
+            } else if (premiuValue >= 1) {
+              // 1 이상일 때 소수점 세 자리만 표현
+              document.getElementById(
+                `premium-${ticker}`
+              ).textContent = `${premiuValue.toFixed(3)} (${premiumRate.toFixed(
+                2
+              )}%)`;
+            } else if (premiuValue < 1) {
+              // 1 이하이면 소수점 네 자리만 표현
               document.getElementById(
                 `premium-${ticker}`
               ).textContent = `${premiuValue.toFixed(4)} (${premiumRate.toFixed(
@@ -128,11 +171,42 @@
             //역프
             document.querySelector(`#premium-${ticker}`).className = "reverse";
 
-            document.getElementById(
-              `premium-${ticker}`
-            ).textContent = `${Number(
-              premiuValue.toFixed(0)
-            ).toLocaleString()} (${premiumRate.toFixed(2)}%)`;
+            if (premiuValue <= -1000) {
+              // 1000 이하일 때 소수점 X
+              document.getElementById(
+                `premium-${ticker}`
+              ).textContent = `${Number(
+                premiuValue.toFixed(0)
+              ).toLocaleString()} (${premiumRate.toFixed(2)}%)`;
+            } else if (premiuValue <= -100) {
+              // 100 이하일 때 소수점 한자리만 표현
+              document.getElementById(
+                `premium-${ticker}`
+              ).textContent = `${premiuValue.toFixed(1)} (${premiumRate.toFixed(
+                2
+              )}%)`;
+            } else if (premiuValue <= -10) {
+              // 10 이하일 때 소수점 두 자리만 표현
+              document.getElementById(
+                `premium-${ticker}`
+              ).textContent = `${premiuValue.toFixed(2)} (${premiumRate.toFixed(
+                2
+              )}%)`;
+            } else if (premiuValue <= -1) {
+              // 1 이하일 때 소수점 세 자리만 표현
+              document.getElementById(
+                `premium-${ticker}`
+              ).textContent = `${premiuValue.toFixed(3)} (${premiumRate.toFixed(
+                2
+              )}%)`;
+            } else if (premiuValue < 0) {
+              // 0 이하이면 소수점 네 자리만 표현
+              document.getElementById(
+                `premium-${ticker}`
+              ).textContent = `${premiuValue.toFixed(4)} (${premiumRate.toFixed(
+                2
+              )}%)`;
+            }
           }
         }
       }
@@ -223,11 +297,11 @@
 
             document.getElementById(
               `lowest_52_week_price_${ticker}`
-            ).textContent = `${lowest_52_week_price}`;
+            ).textContent = `${lowest_52_week_price.toLocaleString()}`;
 
             document.getElementById(
               `acc_trade_price_24h_${ticker}`
-            ).textContent = `${(acc_trade_price_24h / 100000000).toFixed()}`;
+            ).textContent = `${(acc_trade_price_24h / 100000000).toFixed(0)}`;
           } else if (source === "bybit") {
             coinData[ticker].bybitPrice = price;
             document.getElementById(
