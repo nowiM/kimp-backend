@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>kimp</title>
+    <title>Kimp</title>
     <style>
       * {
         padding: 0;
@@ -26,13 +26,13 @@
         width: 100%;
       }
       .kimpTable .container .table {
-        width: 100%; /* 추가된 부분 */
+        width: 100%;
         text-align: center;
-        table-layout: fixed; /* 추가된 부분 */
+        table-layout: fixed;
       }
       .kimpTable .container .table .tableHeader,
       .kimpTable .container .table .tableBody {
-        width: 100%; /* 추가된 부분 */
+        width: 100%;
       }
 
       .kimpTable .container .table .tableBody .coinLogo {
@@ -42,24 +42,19 @@
       }
 
       .kimpTable .container .table .tableBody .rise {
-        /*등락(상승)*/
         color: red;
       }
       .kimpTable .container .table .tableBody .fall {
-        /*등락(하락)*/
         color: blue;
       }
       .kimpTable .container .table .tableBody .even {
-        /*등락(보합)*/
         color: black;
       }
 
       .kimpTable .container .table .tableBody .kimp {
-        /*김프*/
         color: blue;
       }
       .kimpTable .container .table .tableBody .reverse {
-        /*역프*/
         color: red;
       }
     </style>
@@ -90,8 +85,7 @@
 
     <script>
       const ws = new WebSocket(`ws://${location.host}`);
-      // const exchangeRate = 1370.86; // 1 USD = 1358.96 KRW
-      let exchangeRate = null; // 1 USD = 1358.96 KRW
+      let exchangeRate = null;
 
       const coinData = {};
 
@@ -110,57 +104,49 @@
 
       fetchExchangeRate();
 
-      console.log(exchangeRate);
-
       function updatePremium(ticker) {
         console.log(exchangeRate);
         if (
           coinData[ticker].upbitPrice !== null &&
-          coinData[ticker].bybitPrice !== null
+          coinData[ticker].bybitPrice !== null &&
+          exchangeRate !== null
         ) {
           const premiuValue =
             coinData[ticker].upbitPrice -
-            coinData[ticker].bybitPrice * exchangeRate; //김프 금액
+            coinData[ticker].bybitPrice * exchangeRate; // 김프 금액
           const premiumRate =
             (coinData[ticker].upbitPrice /
               (coinData[ticker].bybitPrice * exchangeRate)) *
               100 -
-            100; //김프율
+            100; // 김프율
 
           if (premiumRate > 0) {
-            //김프
             document.querySelector(`#premium-${ticker}`).className = "kimp";
-            //console.log(premiuValue);
             if (premiuValue >= 1000) {
-              // 1000 이상일 때 소수점 X
               document.getElementById(
                 `premium-${ticker}`
               ).textContent = `${Number(
                 premiuValue.toFixed(0)
               ).toLocaleString()} (${premiumRate.toFixed(2)}%)`;
             } else if (premiuValue >= 100) {
-              // 100 이상일 때 소수점 한자리만 표현
               document.getElementById(
                 `premium-${ticker}`
               ).textContent = `${premiuValue.toFixed(1)} (${premiumRate.toFixed(
                 2
               )}%)`;
             } else if (premiuValue >= 10) {
-              // 10 이상일 때 소수점 두 자리만 표현
               document.getElementById(
                 `premium-${ticker}`
               ).textContent = `${premiuValue.toFixed(2)} (${premiumRate.toFixed(
                 2
               )}%)`;
             } else if (premiuValue >= 1) {
-              // 1 이상일 때 소수점 세 자리만 표현
               document.getElementById(
                 `premium-${ticker}`
               ).textContent = `${premiuValue.toFixed(3)} (${premiumRate.toFixed(
                 2
               )}%)`;
             } else if (premiuValue < 1) {
-              // 1 이하이면 소수점 네 자리만 표현
               document.getElementById(
                 `premium-${ticker}`
               ).textContent = `${premiuValue.toFixed(4)} (${premiumRate.toFixed(
@@ -168,39 +154,32 @@
               )}%)`;
             }
           } else if (premiumRate < 0) {
-            //역프
             document.querySelector(`#premium-${ticker}`).className = "reverse";
-
             if (premiuValue <= -1000) {
-              // 1000 이하일 때 소수점 X
               document.getElementById(
                 `premium-${ticker}`
               ).textContent = `${Number(
                 premiuValue.toFixed(0)
               ).toLocaleString()} (${premiumRate.toFixed(2)}%)`;
             } else if (premiuValue <= -100) {
-              // 100 이하일 때 소수점 한자리만 표현
               document.getElementById(
                 `premium-${ticker}`
               ).textContent = `${premiuValue.toFixed(1)} (${premiumRate.toFixed(
                 2
               )}%)`;
             } else if (premiuValue <= -10) {
-              // 10 이하일 때 소수점 두 자리만 표현
               document.getElementById(
                 `premium-${ticker}`
               ).textContent = `${premiuValue.toFixed(2)} (${premiumRate.toFixed(
                 2
               )}%)`;
             } else if (premiuValue <= -1) {
-              // 1 이하일 때 소수점 세 자리만 표현
               document.getElementById(
                 `premium-${ticker}`
               ).textContent = `${premiuValue.toFixed(3)} (${premiumRate.toFixed(
                 2
               )}%)`;
             } else if (premiuValue < 0) {
-              // 0 이하이면 소수점 네 자리만 표현
               document.getElementById(
                 `premium-${ticker}`
               ).textContent = `${premiuValue.toFixed(4)} (${premiumRate.toFixed(
@@ -223,14 +202,16 @@
         tr.className = "coin";
         tr.id = `coin-${ticker}`;
         tr.innerHTML = `
-        <td><img class = "coinLogo" src="https://static.upbit.com/logos/${ticker}.png" alt="${ticker}" />${ticker}</td>
-        <td id = "upbit-${ticker}">${upbitPrice}</td>
-        <td id = "bybit-${ticker}">${bybitPrice}</td>
-        <td id = "signed-change-rate_${ticker}">${signedChangeRate}</td>
-        <td id = "lowest_52_week_price_${ticker}">${lowest_52_week_price}</td>
-        <td id = "acc_trade_price_24h_${ticker}">${acc_trade_price_24h}</td>
-        <td id = "premium-${ticker}"></td>
-      `;
+          <td><img class="coinLogo" src="https://static.upbit.com/logos/${ticker}.png" alt="${ticker}" />${ticker}</td>
+          <td id="upbit-${ticker}">${upbitPrice}</td>
+          <td id="bybit-${ticker}">${bybitPrice}</td>
+          <td id="signed-change-rate_${ticker}">${
+          signedChangeRate > 0 ? `+${signedChangeRate}` : signedChangeRate
+        }</td>
+          <td id="lowest_52_week_price_${ticker}">${lowest_52_week_price}</td>
+          <td id="acc_trade_price_24h_${ticker}">${acc_trade_price_24h}</td>
+          <td id="premium-${ticker}"></td>
+        `;
         document.querySelector(".tableBody").appendChild(tr);
       }
 
@@ -241,74 +222,104 @@
       ws.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data);
-          //console.log("Received message:", message);
-          const {
-            source,
-            ticker,
-            price,
-            signedChangeRate,
-            lowest_52_week_price,
-            acc_trade_price_24h,
-          } = message; //거래소, 코인심볼, 가격, 부호가 있는 변화율
-          if (!coinData[ticker]) {
-            coinData[ticker] = {
-              upbitPrice: null,
-              bybitPrice: null,
-              signedChangeRate: null,
-            };
-            createCoinElement(ticker);
-          }
+          //console.log(message);
+          if (message.source === "initial") {
+            const { upbit, bybit } = message.data;
 
-          if (source === "upbit") {
-            coinData[ticker].upbitPrice = price;
-            coinData[ticker].lowest_52_week_price = lowest_52_week_price;
-            coinData[ticker].acc_trade_price_24h = acc_trade_price_24h;
-            document.getElementById(
-              `upbit-${ticker}`
-            ).textContent = `${price.toLocaleString()}`;
-            if (signedChangeRate > 0) {
-              //상승
-              document.querySelector(
-                `#signed-change-rate_${ticker}`
-              ).className = "rise";
+            for (const ticker in upbit) {
+              const upbitData = upbit[ticker];
+              const bybitData = bybit[ticker] || { price: null };
 
-              document.getElementById(
-                `signed-change-rate_${ticker}`
-              ).textContent = `+${(signedChangeRate * 100).toFixed(2)}%`;
-            } else if (signedChangeRate < 0) {
-              //하락
-              document.querySelector(
-                `#signed-change-rate_${ticker}`
-              ).className = "fall";
+              coinData[ticker] = {
+                upbitPrice: upbitData.price,
+                bybitPrice: bybitData.price,
+                signedChangeRate: upbitData.signedChangeRate,
+                lowest_52_week_price: upbitData.lowest_52_week_price,
+                acc_trade_price_24h: upbitData.acc_trade_price_24h,
+              };
+              createCoinElement(
+                ticker,
+                upbitData.price.toLocaleString(),
+                bybitData.price ? bybitData.price.toLocaleString() : "",
+                (upbitData.signedChangeRate * 100).toFixed(2),
+                upbitData.lowest_52_week_price.toLocaleString(),
+                (upbitData.acc_trade_price_24h / 100000000).toFixed(0)
+              );
 
-              document.getElementById(
-                `signed-change-rate_${ticker}`
-              ).textContent = `${(signedChangeRate * 100).toFixed(2)}%`;
-            } else {
-              //보합
-              document.querySelector(
-                `#signed-change-rate_${ticker}`
-              ).className = "even";
+              // signedChangeRate에 따라 클래스 추가
+              if (upbitData.signedChangeRate > 0) {
+                document.querySelector(
+                  `#signed-change-rate_${ticker}`
+                ).className = "rise";
+              } else if (upbitData.signedChangeRate < 0) {
+                document.querySelector(
+                  `#signed-change-rate_${ticker}`
+                ).className = "fall";
+              } else {
+                document.querySelector(
+                  `#signed-change-rate_${ticker}`
+                ).className = "even";
+              }
+              updatePremium(ticker);
+            }
+          } else if (message.source === "upbit" || message.source === "bybit") {
+            const { ticker } = message;
 
-              document.querySelector(
-                `#signed-change-rate_${ticker}`
-              ).textContent = `${(signedChangeRate * 100).toFixed(2)}%`;
+            if (!coinData[ticker]) {
+              coinData[ticker] = {
+                upbitPrice: null,
+                bybitPrice: null,
+              };
+              createCoinElement(ticker);
             }
 
-            document.getElementById(
-              `lowest_52_week_price_${ticker}`
-            ).textContent = `${lowest_52_week_price.toLocaleString()}`;
+            if (message.source === "upbit") {
+              coinData[ticker].upbitPrice = message.price;
+              document.getElementById(`upbit-${ticker}`).textContent =
+                message.price.toLocaleString();
 
-            document.getElementById(
-              `acc_trade_price_24h_${ticker}`
-            ).textContent = `${(acc_trade_price_24h / 100000000).toFixed(0)}`;
-          } else if (source === "bybit") {
-            coinData[ticker].bybitPrice = price;
-            document.getElementById(
-              `bybit-${ticker}`
-            ).textContent = `${price.toLocaleString()}`;
+              if (message.signedChangeRate > 0) {
+                //상승
+                document.querySelector(
+                  `#signed-change-rate_${ticker}`
+                ).className = "rise";
+
+                document.getElementById(
+                  `signed-change-rate_${ticker}`
+                ).textContent = `+${(message.signedChangeRate * 100).toFixed(
+                  2
+                )}%`;
+              } else if (message.signedChangeRate < 0) {
+                //하락
+                document.querySelector(
+                  `#signed-change-rate_${ticker}`
+                ).className = "fall";
+
+                document.getElementById(
+                  `signed-change-rate_${ticker}`
+                ).textContent = `${(message.signedChangeRate * 100).toFixed(
+                  2
+                )}%`;
+              } else {
+                //보합
+                document.querySelector(
+                  `#signed-change-rate_${ticker}`
+                ).className = "even";
+
+                document.querySelector(
+                  `#signed-change-rate_${ticker}`
+                ).textContent = `${(message.signedChangeRate * 100).toFixed(
+                  2
+                )}%`;
+              }
+            } else if (message.source === "bybit") {
+              coinData[ticker].bybitPrice = message.price;
+              document.getElementById(`bybit-${ticker}`).textContent =
+                message.price.toLocaleString();
+            }
+
+            updatePremium(ticker);
           }
-          updatePremium(ticker);
         } catch (error) {
           console.error("Error parsing JSON:", error);
         }
