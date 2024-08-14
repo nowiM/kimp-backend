@@ -1,6 +1,6 @@
 const WebSocket = require('ws');
 
-function connectBybit(ws, tickers) {
+function connectBybit(coinData, tickers, wss) {
   const bybitSocket = new WebSocket('wss://stream.bybit.com/v5/public/linear');
 
   bybitSocket.onopen = () => {
@@ -17,8 +17,17 @@ function connectBybit(ws, tickers) {
       const data = JSON.parse(event.data);
       if (data.topic && data.data && data.data.length > 0) {
         const ticker = data.topic.split('.')[1].replace('USDT', '');
-        const bybitPrice = parseFloat(data.data[0].p);
-        ws.send(JSON.stringify({ source: 'bybit', ticker, price: bybitPrice }));
+        const bybitData = {
+          price: parseFloat(data.data[0].p)
+        };
+        coinData.bybit[ticker] = bybitData;
+
+        // 실시간으로 클라이언트에게 데이터 전송
+        wss.clients.forEach(client => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({ source: 'bybit', ticker, ...bybitData }));
+          }
+        });
       }
     } catch (error) {
       console.error('Error parsing Bybit data:', error);
