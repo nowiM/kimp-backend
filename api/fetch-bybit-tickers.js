@@ -12,7 +12,7 @@ async function fetchBybitTickers() {
             .map((result) => result.name)
             .map((name) => name.split("USDT")[0]);
 
-        return upbitTickers.filter(coinsName => bybitTickers.includes(coinsName));
+        return upbitTickers.filter(coinsName => bybitTickers.includes(coinsName) && coinsName !== 'TON');
     } catch (error) {
         console.error('Error fetching tickers:', error);
         return [];

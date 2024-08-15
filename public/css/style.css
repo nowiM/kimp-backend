@@ -1,0 +1,52 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    }
+h1 {
+    text-align: center;
+}
+body {
+    font-family: Arial, sans-serif;
+}
+.kimpTable {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.kimpTable .container {
+    max-width: 1200px;
+    width: 100%;
+}
+.kimpTable .container .table {
+    width: 100%;
+    text-align: center;
+    table-layout: fixed;
+}
+.kimpTable .container .table .tableHeader,
+.kimpTable .container .table .tableBody {
+    width: 100%;
+}
+
+.kimpTable .container .table .tableBody .coinLogo {
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+}
+
+.kimpTable .container .table .tableBody .rise {/*등락 --> 상승*/
+    color: red;
+}
+.kimpTable .container .table .tableBody .fall {/*등락 --> 하락*/
+    color: blue;
+    }
+.kimpTable .container .table .tableBody .even {/*등락 --> 보합*/
+    color: black;
+}
+
+.kimpTable .container .table .tableBody .kimp {/*김프*/
+    color: blue;
+}
+.kimpTable .container .table .tableBody .reverse {/*역프*/
+    color: red;
+}
