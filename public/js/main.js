@@ -1,47 +1,9 @@
+import { updatePremium } from './modules/updatePremium.js';
+import { createCoinElement } from './modules/createCoinElement.js'
+
 const ws = new WebSocket(`ws://${location.host}`);
 let exchangeRate = null;
 const coinData = {};
-
-function updatePremium(ticker) {
-    if (coinData[ticker].upbitPrice !== null && coinData[ticker].bybitPrice !== null && exchangeRate !== null) {
-        const premiumValue = coinData[ticker].upbitPrice - coinData[ticker].bybitPrice * exchangeRate; // 김프 금액
-        const premiumRate = (coinData[ticker].upbitPrice / (coinData[ticker].bybitPrice * exchangeRate)) * 100 - 100; // 김프율
-
-        const premiumText = (value, rate, digits) => `${value.toFixed(digits)} (${rate.toFixed(2)}%)`;
-        const updateElement = (value, digits) => document.getElementById(`premium-${ticker}`).textContent = premiumText(value, premiumRate, digits);
-
-        if (premiumRate > 0) {
-            document.querySelector(`#premium-${ticker}`).className = "kimp";
-            if (premiumValue >= 1000) updateElement(premiumValue, 0);
-            else if (premiumValue >= 100) updateElement(premiumValue, 1);
-            else if (premiumValue >= 10) updateElement(premiumValue, 2);
-            else if (premiumValue >= 1) updateElement(premiumValue, 3);
-            else updateElement(premiumValue, 4);
-        } else {
-            document.querySelector(`#premium-${ticker}`).className = "reverse";
-            if (premiumValue <= -1000) updateElement(premiumValue, 0);
-            else if (premiumValue <= -100) updateElement(premiumValue, 1);
-            else if (premiumValue <= -10) updateElement(premiumValue, 2);
-            else if (premiumValue <= -1) updateElement(premiumValue, 3);
-            else updateElement(premiumValue, 4);
-        }
-    }
-}
-
-function createCoinElement(ticker, upbitPrice = "", bybitPrice = "", signedChangeRate = "", lowest_52_week_price = "", acc_trade_price_24h) {
-    const tr = document.createElement("tr");
-    tr.className = "coin";
-    tr.id = `coin-${ticker}`;
-    tr.innerHTML = `
-        <td><img class="coinLogo" src="https://static.upbit.com/logos/${ticker}.png" alt="${ticker}" />${ticker}</td>
-        <td id="upbit-${ticker}">${upbitPrice}</td>
-        <td id="bybit-${ticker}">${bybitPrice}</td>
-        <td id="signed-change-rate_${ticker}">${signedChangeRate > 0 ? `+${signedChangeRate}` : signedChangeRate}</td>
-        <td id="lowest_52_week_price_${ticker}">${lowest_52_week_price}</td>
-        <td id="acc_trade_price_24h_${ticker}">${acc_trade_price_24h}</td>
-        <td id="premium-${ticker}"></td>`;
-    document.querySelector(".tableBody").appendChild(tr);
-}
 
 ws.onopen = () => console.log("서버와 WebSocket 연결 성공");
 
@@ -74,7 +36,7 @@ ws.onmessage = (event) => {
 
                 const signedChangeClass = upbitData.signedChangeRate > 0 ? "rise" : upbitData.signedChangeRate < 0 ? "fall" : "even";
                 document.querySelector(`#signed-change-rate_${ticker}`).className = signedChangeClass;
-                updatePremium(ticker);
+                updatePremium(ticker, coinData, exchangeRate);
             }
         } else if (message.source === "exchangeRateUpdate") {
             exchangeRate = message.exchangeRate;
@@ -82,7 +44,7 @@ ws.onmessage = (event) => {
 
             // 새로운 환율로 프리미엄 업데이트
             for (const ticker in coinData) {
-                updatePremium(ticker);
+                updatePremium(ticker, coinData, exchangeRate);
             }
         } else if (message.source === "upbit" || message.source === "bybit") {
             const { ticker } = message;
@@ -104,7 +66,7 @@ ws.onmessage = (event) => {
                 document.getElementById(`bybit-${ticker}`).textContent = message.price.toLocaleString();
             }
 
-            updatePremium(ticker);
+            updatePremium(ticker, coinData, exchangeRate);
         }
     } catch (error) {
         console.error("Error parsing JSON:", error);
