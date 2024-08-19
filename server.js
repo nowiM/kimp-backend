@@ -46,10 +46,29 @@ const coinData = {
 wss.on('connection', (ws) => {
   console.log('Client connected');
 
-  // 클라이언트가 연결될 때 서버에서 수집된 최신 데이터를 클라이언트에 전달
+  // 수집된 데이터를 거래대금 내림차순으로 정렬한다
+  const sortedData = Object.keys(coinData.upbit)
+    .map(ticker => ({
+      ticker,
+      upbit: coinData.upbit[ticker],
+      bybit: coinData.bybit[ticker] || null
+    }))
+    .sort((a, b) => (b.upbit.acc_trade_price_24h || 0) - (a.upbit.acc_trade_price_24h || 0));
+
+  // 클라이언트가 연결될 때 서버에서 수집된 최신 데이터를 정렬 후 클라이언트에 전달
+  const sortedCoinData = {
+    upbit: {},
+    bybit: {}
+  };
+
+  sortedData.forEach(({ ticker, upbit, bybit }) => {
+    sortedCoinData.upbit[ticker] = upbit;
+    sortedCoinData.bybit[ticker] = bybit;
+  });
+
   ws.send(JSON.stringify({
     source: 'initial',
-    data: coinData,
+    data: sortedCoinData,
     exchangeRate
   }));
 
