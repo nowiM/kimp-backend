@@ -1,6 +1,8 @@
 export const createCoinElement = (
-    ticker, upbitPrice = "", 
-    bybitPrice = "", signedChangeRate = "", 
+    ticker, 
+    upbitPrice = "", 
+    bybitPrice = "", 
+    signedChangeRate = "", 
     lowest_52_week_price = "", 
     acc_trade_price_24h) => {
     const tr = document.createElement("tr");

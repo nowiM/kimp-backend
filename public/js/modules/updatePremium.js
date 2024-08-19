@@ -1,4 +1,6 @@
 export const updatePremium = (ticker, coinData, exchangeRate) => {
+    //console.log('upbit:', coinData[ticker].upbitPrice);
+    //console.log('bybit:', coinData[ticker].bybitPrice);
     if (coinData[ticker].upbitPrice !== null && coinData[ticker].bybitPrice !== null && exchangeRate !== null) {
         const premiumValue = coinData[ticker].upbitPrice - coinData[ticker].bybitPrice * exchangeRate; // 김프 금액
         const premiumRate = (coinData[ticker].upbitPrice / (coinData[ticker].bybitPrice * exchangeRate)) * 100 - 100; // 김프율

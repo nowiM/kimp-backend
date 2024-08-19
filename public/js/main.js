@@ -1,9 +1,11 @@
 import { updatePremium } from './modules/updatePremium.js';
 import { createCoinElement } from './modules/createCoinElement.js'
+import { renderTable } from './modules/kimpTableSort.js'
 
 const ws = new WebSocket(`ws://${location.host}`);
 let exchangeRate = null;
 const coinData = {};
+let sortDescending = true; // 초기 정렬 순서: 내림차순
 
 ws.onopen = () => console.log("서버와 WebSocket 연결 성공");
 
@@ -19,25 +21,15 @@ ws.onmessage = (event) => {
                 const bybitData = bybit[ticker] || { price: null };
 
                 coinData[ticker] = {
+                    ticker: ticker,
                     upbitPrice: upbitData.price,
                     bybitPrice: bybitData.price,
                     signedChangeRate: upbitData.signedChangeRate,
                     lowest_52_week_price: upbitData.lowest_52_week_price,
                     acc_trade_price_24h: upbitData.acc_trade_price_24h,
                 };
-                createCoinElement(
-                    ticker,
-                    upbitData.price.toLocaleString(),
-                    bybitData.price ? bybitData.price.toLocaleString() : "",
-                    (upbitData.signedChangeRate * 100).toFixed(2),
-                    upbitData.lowest_52_week_price.toLocaleString(),
-                    (upbitData.acc_trade_price_24h / 100000000).toFixed(0)
-                );
-
-                const signedChangeClass = upbitData.signedChangeRate > 0 ? "rise" : upbitData.signedChangeRate < 0 ? "fall" : "even";
-                document.querySelector(`#signed-change-rate_${ticker}`).className = signedChangeClass;
-                updatePremium(ticker, coinData, exchangeRate);
             }
+            renderTable(sortDescending, coinData, exchangeRate, 'acc_trade_price_24h');
         } else if (message.source === "exchangeRateUpdate") {
             exchangeRate = message.exchangeRate;
             console.log('새로운 달러 환율 1USD =>', exchangeRate);
@@ -75,3 +67,15 @@ ws.onmessage = (event) => {
 
 ws.onerror = (error) => console.error("WebSocket 오류:", error);
 ws.onclose = () => console.log("WebSocket 연결 종료");
+
+// 정렬 버튼 클릭 이벤트 처리
+document.querySelectorAll("#sortVolume").forEach(button => {
+    button.addEventListener("click", (event) => {
+        const selectSort = event.target.className;
+
+        sortDescending = !sortDescending; // 정렬 순서 반전
+        renderTable(sortDescending, coinData, exchangeRate, selectSort); // 테이블 재렌더링
+    });
+})
+
+console.log(coinData);
