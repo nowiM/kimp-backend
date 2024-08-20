@@ -1,11 +1,24 @@
 import { updatePremium } from './modules/updatePremium.js';
-import { createCoinElement } from './modules/createCoinElement.js'
-import { renderTable } from './modules/kimpTableSort.js'
+import { createCoinElement } from './modules/createCoinElement.js';
+import { renderTable } from './modules/kimpTableSort.js';
 
 const ws = new WebSocket(`ws://${location.host}`);
 let exchangeRate = null;
 const coinData = {};
-let sortDescending = true; // 초기 정렬 순서: 내림차순
+let sortDescending = false; // 초기 정렬 순서: 내림차순
+
+// 정렬 상태를 로컬 스토리지에 저장하는 함수
+function saveSortState(sortKey, sortDescending) {
+    localStorage.setItem('sortKey', sortKey);
+    localStorage.setItem('sortDescending', sortDescending);
+}
+
+// 로컬 스토리지에서 정렬 상태를 불러오는 함수
+function loadSortState() {
+    const sortKey = localStorage.getItem('sortKey');
+    const sortDescending = localStorage.getItem('sortDescending') === 'true';
+    return { sortKey, sortDescending };
+}
 
 ws.onopen = () => console.log("서버와 WebSocket 연결 성공");
 
@@ -16,6 +29,10 @@ ws.onmessage = (event) => {
             exchangeRate = message.exchangeRate;
             console.log('초기 달러 환율 1USD =>', exchangeRate);
             const { upbit, bybit } = message.data;
+
+            // 로컬 스토리지에 정렬 정보가 없는 경우 기본 정렬 기준으로 렌더링
+            const { sortKey, sortDescending } = loadSortState();
+
             for (const ticker in upbit) {
                 const upbitData = upbit[ticker];
                 const bybitData = bybit[ticker] || { price: null };
@@ -28,8 +45,20 @@ ws.onmessage = (event) => {
                     lowest_52_week_price: upbitData.lowest_52_week_price,
                     acc_trade_price_24h: upbitData.acc_trade_price_24h,
                 };
+                // 서버에서 정렬된 데이터를 이미 받고 있으므로 바로 테이블 생성
+                createCoinElement(
+                    ticker,
+                    upbitData.price.toLocaleString(),
+                    bybitData.price ? bybitData.price.toLocaleString() : "",
+                    (upbitData.signedChangeRate * 100).toFixed(2),
+                    upbitData.lowest_52_week_price.toLocaleString(),
+                    (upbitData.acc_trade_price_24h / 100000000).toFixed(0)
+                );
+                updatePremium(ticker, coinData, exchangeRate);
             }
-            renderTable(sortDescending, coinData, exchangeRate, 'acc_trade_price_24h');
+            if(sortKey) {
+                renderTable(sortDescending, coinData, exchangeRate, sortKey);
+            }
         } else if (message.source === "exchangeRateUpdate") {
             exchangeRate = message.exchangeRate;
             console.log('새로운 달러 환율 1USD =>', exchangeRate);
@@ -74,8 +103,7 @@ document.querySelectorAll("#sortVolume").forEach(button => {
         const selectSort = event.target.className;
 
         sortDescending = !sortDescending; // 정렬 순서 반전
+        saveSortState(selectSort, sortDescending); // 정렬 상태 저장
         renderTable(sortDescending, coinData, exchangeRate, selectSort); // 테이블 재렌더링
     });
-})
-
-console.log(coinData);
+});
