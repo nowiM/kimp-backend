@@ -31,11 +31,11 @@ export const renderTable = (sortDescending, coinData, exchangeRate, selectSort) 
         const data = coinData[ticker];
         createCoinElement(
             ticker,
-            data.upbitPrice.toLocaleString(),
-            data.bybitPrice ? data.bybitPrice.toLocaleString() : "",
-            (data.signedChangeRate * 100).toFixed(2),
-            data.lowest_52_week_price.toLocaleString(),
-            (data.acc_trade_price_24h / 100000000).toFixed(0)
+            data.upbitPrice,
+            data.bybitPrice,
+            Math.floor(data.signedChangeRate * 10000) / 100,
+            data.lowest_52_week_price,
+            Math.floor(data.acc_trade_price_24h / 100000000)
         );
         updatePremium(ticker, coinData, exchangeRate);
 

@@ -1,6 +1,8 @@
 import { updatePremium } from './modules/updatePremium.js';
 import { createCoinElement } from './modules/createCoinElement.js';
 import { renderTable } from './modules/kimpTableSort.js';
+import { formatUpbitPrice } from './modules/formatUpbitPrice.js';
+import { formatBybitPrice } from './modules/formatBybitPrice.js';
 
 const ws = new WebSocket(`ws://${location.host}`);
 let exchangeRate = null;
@@ -25,6 +27,7 @@ ws.onopen = () => console.log("서버와 WebSocket 연결 성공");
 ws.onmessage = (event) => {
     try {
         const message = JSON.parse(event.data);
+        //console.log(message);
         if (message.source === "initial") {
             exchangeRate = message.exchangeRate;
             console.log('초기 달러 환율 1USD =>', exchangeRate);
@@ -48,11 +51,11 @@ ws.onmessage = (event) => {
                 // 서버에서 정렬된 데이터를 이미 받고 있으므로 바로 테이블 생성
                 createCoinElement(
                     ticker,
-                    upbitData.price.toLocaleString(),
-                    bybitData.price ? bybitData.price.toLocaleString() : "",
-                    (upbitData.signedChangeRate * 100).toFixed(2),
-                    upbitData.lowest_52_week_price.toLocaleString(),
-                    (upbitData.acc_trade_price_24h / 100000000).toFixed(0)
+                    upbitData.price,
+                    bybitData.price,
+                    Math.floor(upbitData.signedChangeRate * 10000) / 100,
+                    upbitData.lowest_52_week_price,
+                    Math.floor(upbitData.acc_trade_price_24h / 100000000)
                 );
                 updatePremium(ticker, coinData, exchangeRate);
             }
@@ -72,22 +75,27 @@ ws.onmessage = (event) => {
 
             if (!coinData[ticker]) {
                 coinData[ticker] = { upbitPrice: null, bybitPrice: null };
+
                 createCoinElement(ticker);
             }
 
             if (message.source === "upbit") {
                 coinData[ticker].upbitPrice = message.price;
-                document.getElementById(`upbit-${ticker}`).textContent = message.price.toLocaleString();
+                document.getElementById(`upbit-${ticker}`).textContent = formatUpbitPrice(message.price);
 
                 const signedChangeClass = message.signedChangeRate > 0 ? "rise" : message.signedChangeRate < 0 ? "fall" : "even";
                 document.querySelector(`#signed-change-rate_${ticker}`).className = signedChangeClass;
-                document.getElementById(`signed-change-rate_${ticker}`).textContent = `${message.signedChangeRate > 0 ? "+" : ""}${(message.signedChangeRate * 100).toFixed(2)}%`;
+                document.getElementById(`signed-change-rate_${ticker}`).textContent = `${message.signedChangeRate > 0 ? "+" : ""}${Math.floor(message.signedChangeRate * 10000) / 100}%`;
             } else if (message.source === "bybit") {
                 coinData[ticker].bybitPrice = message.price;
-                document.getElementById(`bybit-${ticker}`).textContent = message.price.toLocaleString();
+                document.getElementById(`bybit-${ticker}`).textContent = formatBybitPrice(message.price);
             }
 
+            
             updatePremium(ticker, coinData, exchangeRate);
+
+            // 매번 실시간 데이터 업데이트 시 정렬 및 테이블 갱신
+            renderTable(sortDescending, coinData, exchangeRate, localStorage.getItem('sortKey'));
         }
     } catch (error) {
         console.error("Error parsing JSON:", error);

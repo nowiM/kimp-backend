@@ -1,3 +1,6 @@
+import { formatUpbitPrice } from './formatUpbitPrice.js';
+import { formatBybitPrice } from './formatBybitPrice.js';
+
 export const createCoinElement = (
     ticker, 
     upbitPrice = "", 
@@ -12,11 +15,11 @@ export const createCoinElement = (
         tr.id = `coin-${ticker}`;
         tr.innerHTML = `
             <td><img class="coinLogo" src="https://static.upbit.com/logos/${ticker}.png" alt="${ticker}" />${ticker}</td>
-            <td id="upbit-${ticker}">${upbitPrice}</td>
-            <td id="bybit-${ticker}">${bybitPrice}</td>
+            <td id="upbit-${ticker}">${formatUpbitPrice(upbitPrice)}</td>
+            <td id="bybit-${ticker}">${formatBybitPrice(bybitPrice)}</td>
             <td id="signed-change-rate_${ticker}" class="${signedChangeClass}">${signedChangeRate > 0 ? `+${signedChangeRate}` : signedChangeRate}</td>
-            <td id="lowest_52_week_price_${ticker}">${lowest_52_week_price}</td>
-            <td id="acc_trade_price_24h_${ticker}">${acc_trade_price_24h}</td>
+            <td id="lowest_52_week_price_${ticker}">${formatUpbitPrice(lowest_52_week_price)}</td>
+            <td id="acc_trade_price_24h_${ticker}">${acc_trade_price_24h}억</td>
             <td id="premium-${ticker}"></td>`;
         document.querySelector(".tableBody").appendChild(tr);
 }
