@@ -16,7 +16,11 @@ function connectBybit(coinData, tickers, wss) {
     try {
       const data = JSON.parse(event.data);
       if (data.topic && data.data && data.data.length > 0) {
-        const ticker = data.topic.split('.')[1].replace('USDT', '');
+        let ticker = data.topic.split('.')[1];
+        
+        // 'USDT' 또는 '1000USDT'를 제거하는 코드
+        ticker = ticker.replace(/1000USDT$/, '').replace(/USDT$/, '');
+        
         const bybitData = {
           price: parseFloat(data.data[0].p)
         };
