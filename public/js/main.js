@@ -3,11 +3,12 @@ import { createCoinElement } from './modules/createCoinElement.js';
 import { renderTable } from './modules/kimpTableSort.js';
 import { formatUpbitPrice } from './modules/formatUpbitPrice.js';
 import { formatBybitPrice } from './modules/formatBybitPrice.js';
+import { formatRate } from './modules/formatRate.js';
 
 const ws = new WebSocket(`ws://${location.host}`);
 let exchangeRate = null;
 const coinData = {};
-let sortDescending = false; // 초기 정렬 순서: 내림차순
+let sortDescending = true; // 초기 정렬 순서: 내림차순
 
 // 정렬 상태를 로컬 스토리지에 저장하는 함수
 function saveSortState(sortKey, sortDescending) {
@@ -79,23 +80,24 @@ ws.onmessage = (event) => {
                 createCoinElement(ticker);
             }
 
-            if (message.source === "upbit") {
+            if(message.source === "bybit") {
+                coinData[ticker].bybitPrice = message.price;
+                document.getElementById(`bybit-${ticker}`).textContent = formatBybitPrice(message.price);
+            } else if(message.source === "upbit") {
                 coinData[ticker].upbitPrice = message.price;
                 document.getElementById(`upbit-${ticker}`).textContent = formatUpbitPrice(message.price);
 
                 const signedChangeClass = message.signedChangeRate > 0 ? "rise" : message.signedChangeRate < 0 ? "fall" : "even";
                 document.querySelector(`#signed-change-rate_${ticker}`).className = signedChangeClass;
-                document.getElementById(`signed-change-rate_${ticker}`).textContent = `${message.signedChangeRate > 0 ? "+" : ""}${Math.floor(message.signedChangeRate * 10000) / 100}%`;
-            } else if (message.source === "bybit") {
-                coinData[ticker].bybitPrice = message.price;
-                document.getElementById(`bybit-${ticker}`).textContent = formatBybitPrice(message.price);
+                document.getElementById(`signed-change-rate_${ticker}`).textContent = `${message.signedChangeRate > 0 ? "+" : ""}${formatRate(Math.floor(message.signedChangeRate * 10000) / 100)}%`;
+                document.getElementById(`acc_trade_price_24h_${ticker}`).textContent =`${Math.floor(message.acc_trade_price_24h / 100000000)}억`
             }
 
             
             updatePremium(ticker, coinData, exchangeRate);
 
             // 매번 실시간 데이터 업데이트 시 정렬 및 테이블 갱신
-            renderTable(sortDescending, coinData, exchangeRate, localStorage.getItem('sortKey'));
+            //renderTable(sortDescending, coinData, exchangeRate, localStorage.getItem('sortKey') || 'acc_trade_price_24h');
         }
     } catch (error) {
         console.error("Error parsing JSON:", error);
@@ -109,7 +111,6 @@ ws.onclose = () => console.log("WebSocket 연결 종료");
 document.querySelectorAll("#sortVolume").forEach(button => {
     button.addEventListener("click", (event) => {
         const selectSort = event.target.className;
-
         sortDescending = !sortDescending; // 정렬 순서 반전
         saveSortState(selectSort, sortDescending); // 정렬 상태 저장
         renderTable(sortDescending, coinData, exchangeRate, selectSort); // 테이블 재렌더링

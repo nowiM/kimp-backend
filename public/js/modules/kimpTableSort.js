@@ -3,7 +3,7 @@ import { createCoinElement } from './createCoinElement.js'
 
 // 정렬 및 테이블 렌더링 함수
 export const renderTable = (sortDescending, coinData, exchangeRate, selectSort) => {
-    console.log(selectSort);
+    //console.log(selectSort);
     let valueA, valueB;
     const sortedTickers = Object.keys(coinData).sort((a, b) => {
         if(selectSort === 'ticker') {
