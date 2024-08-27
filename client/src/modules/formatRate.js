@@ -1,4 +1,4 @@
-export const formatRate = (rate) => {
+const formatRate = (rate) => {
     const rateStr = (Math.floor(rate * 100) / 100).toString();
     const parts = rateStr.split('.');
 
@@ -11,3 +11,5 @@ export const formatRate = (rate) => {
         return rateStr;  // 이미 2자리이면 그대로 반환
     }
 };
+
+export default formatRate;

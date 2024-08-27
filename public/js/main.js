@@ -1,5 +1,5 @@
 import { updatePremium } from './modules/updatePremium.js';
-import { createCoinElement, updateRowDataInTable } from './modules/createCoinElement.js';
+import { createCoinElement } from './modules/createCoinElement.js';
 import { formatUpbitPrice } from './modules/formatUpbitPrice.js';
 import { formatBybitPrice } from './modules/formatBybitPrice.js';
 import { formatRate } from './modules/formatRate.js';
@@ -7,7 +7,6 @@ import { formatRate } from './modules/formatRate.js';
 const ws = new WebSocket(`ws://${location.host}`);
 let exchangeRate = null;
 const coinData = {};
-let table;  // DataTable 인스턴스를 저장하기 위한 변수
 
 ws.onopen = () => console.log("서버와 WebSocket 연결 성공");
 
@@ -44,14 +43,6 @@ ws.onmessage = (event) => {
                 
                 updatePremium(ticker, coinData, exchangeRate);
             }
-            
-            // DataTable 초기화
-            table = $('.table').DataTable({
-                "order": [[5, "desc"]],
-                "paging": false,
-                "searching": false,
-                "info": false,
-            });
 
         } else if (message.source === "exchangeRateUpdate") {
             exchangeRate = message.exchangeRate;
@@ -70,22 +61,19 @@ ws.onmessage = (event) => {
 
             if (message.source === "bybit") {
                 coinData[ticker].bybitPrice = message.price;
+                document.getElementById(`bybit-${ticker}`).textContent = formatBybitPrice(message.price);
             } else if (message.source === "upbit") {
                 coinData[ticker].upbitPrice = message.price;
-                coinData[ticker].signedChangeRate = Math.floor(message.signedChangeRate* 10000) / 100;
-                coinData[ticker].acc_trade_price_24h = message.acc_trade_price_24h;
-            }
+                document.getElementById(`upbit-${ticker}`).textContent = formatUpbitPrice(message.price);
 
-            // 행 데이터를 업데이트합니다.
-            updateRowDataInTable(ticker, coinData[ticker]);
+                const signedChangeClass = message.signedChangeRate > 0 ? "rise" : message.signedChangeRate < 0 ? "fall" : "even";
+                document.querySelector(`#signed-change-rate_${ticker}`).className = signedChangeClass;
+                document.getElementById(`signed-change-rate_${ticker}`).textContent = `${message.signedChangeRate > 0 ? "+" : ""}${formatRate(Math.floor(message.signedChangeRate * 10000) / 100)}%`;
+                document.getElementById(`acc_trade_price_24h_${ticker}`).textContent =`${Math.floor(message.acc_trade_price_24h / 100000000)}억`
+            }
 
             // 김프 업데이트
             updatePremium(ticker, coinData, exchangeRate);
-            
-            // 현재 정렬 상태를 유지하며 테이블 갱신
-            if (table) {
-                table.row(`#coin-${ticker}`).invalidate().draw(false); // redraw without changing pagination
-            }
         }
     } catch (error) {
         console.error("Error parsing JSON:", error);

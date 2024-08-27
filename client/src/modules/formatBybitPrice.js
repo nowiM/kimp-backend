@@ -1,6 +1,6 @@
-import { formatNumberWithCommas } from './formatNumberWithCommas.js';
+import formatNumberWithCommas from './formatNumberWithCommas.js';
 
-export const formatBybitPrice = (price) => {
+const formatBybitPrice = (price) => {
     if(!price) {
         return '';
     } else if(price >= 100) {
@@ -11,3 +11,5 @@ export const formatBybitPrice = (price) => {
         return formatNumberWithCommas(price, 4);
     }
 }
+
+export default formatBybitPrice;

@@ -1,4 +1,4 @@
-export const formatNumberWithCommas = (number, digits) => {
+const formatNumberWithCommas = (number, digits) => {
     const factor = Math.pow(10, digits);
     const realNumber = Math.floor(number * factor) / factor; // 반올림 없이 자르기
     const parts = realNumber.toString().split('.'); // 정수 부분과 소수 부분을 나눔
@@ -17,3 +17,5 @@ export const formatNumberWithCommas = (number, digits) => {
 
     return parts.join('.');
 }
+
+export default formatNumberWithCommas;
