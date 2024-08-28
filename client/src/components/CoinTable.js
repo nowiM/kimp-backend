@@ -1,7 +1,7 @@
 import React from 'react';
 import CoinRow from './CoinRow';
 
-const CoinTable = ({ coinData, exchangeRate }) => {
+const CoinTable = ({ coinData, exchangeRate, onCoinClick }) => {
   return (
     <div className="kimpTable">
       <div className="container">
@@ -19,7 +19,13 @@ const CoinTable = ({ coinData, exchangeRate }) => {
           </thead>
           <tbody className="tableBody">
             {Object.keys(coinData).map(ticker => (
-              <CoinRow key={ticker} ticker={ticker} data={coinData[ticker]} exchangeRate={exchangeRate} />
+              <CoinRow 
+                key={ticker} 
+                ticker={ticker} 
+                data={coinData[ticker]} 
+                exchangeRate={exchangeRate}
+                onClick={() => onCoinClick(ticker)} // Add onClick handler
+              />
             ))}
           </tbody>
         </table>

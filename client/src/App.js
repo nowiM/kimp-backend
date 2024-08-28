@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import CoinTable from './components/CoinTable.js';
+import CoinTable from './components/CoinTable';
+import CoinDetail from './components/CoinDetail'; // Import the new CoinDetail component
+import TopArea from './components/TopArea'; 
 import './index.css';
 
 function App() {
   const [coinData, setCoinData] = useState({});
   const [exchangeRate, setExchangeRate] = useState(null);
+  const [selectedCoin, setSelectedCoin] = useState('BTC'); // Default to Bitcoin
 
   useEffect(() => {
-    const  ws = new WebSocket(`ws://${window.location.hostname}:8000`);
+    const ws = new WebSocket(`ws://${window.location.hostname}:8000`);
     ws.onopen = () => console.log("서버와 WebSocket 연결 성공");
 
     ws.onmessage = (event) => {
@@ -67,10 +70,24 @@ function App() {
     };
   }, []);
 
+  const handleCoinClick = (ticker) => {
+    setSelectedCoin(ticker);
+  };
+
   return (
     <div>
+      <TopArea></TopArea>
+      <CoinDetail 
+        coin={selectedCoin} 
+        data={coinData[selectedCoin]} 
+        exchangeRate={exchangeRate} 
+      />
       <h1>Real-time Upbit & Bybit Ticker Data</h1>
-      <CoinTable coinData={coinData} exchangeRate={exchangeRate} />
+      <CoinTable 
+        coinData={coinData} 
+        exchangeRate={exchangeRate} 
+        onCoinClick={handleCoinClick} // Pass the click handler
+      />
     </div>
   );
 }

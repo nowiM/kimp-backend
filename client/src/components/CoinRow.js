@@ -2,28 +2,18 @@ import React from 'react';
 import formatUpbitPrice from '../modules/formatUpbitPrice.js';
 import formatBybitPrice from '../modules/formatBybitPrice.js';
 import formatRate from '../modules/formatRate.js';
+import updatePremium from '../modules/updatePremium.js';
 
-const CoinRow = ({ ticker, data, exchangeRate }) => {
-  let premiumValue = '';
-  let premiumRate = '';
-  let premiumClass = '';
-
-  if (data.upbitPrice !== null && data.bybitPrice !== null && exchangeRate !== null) {
-    if (ticker === 'SHIB') {
-      premiumValue = data.upbitPrice - data.bybitPrice; // 김프 금액
-      premiumRate = (data.upbitPrice / data.bybitPrice) * 100 - 100; // 김프율
-    } else {
-      premiumValue = data.upbitPrice - (data.bybitPrice * exchangeRate);
-      premiumRate = (data.upbitPrice / (data.bybitPrice * exchangeRate)) * 100 - 100; // 김프율
-    }
-    premiumClass = premiumRate > 0 ? "kimp" : "reverse";
-  }
-
+const CoinRow = ({ ticker, data, exchangeRate, onClick }) => {
+  const { premiumClass, premiumValue, premiumRate } = updatePremium(ticker, data, exchangeRate);
   const signedChangeClass = data.signedChangeRate > 0 ? "rise" : data.signedChangeRate < 0 ? "fall" : "even";
 
   return (
-    <tr id={`coin-${ticker}`}>
-      <td><img className="coinLogo" src={`https://static.upbit.com/logos/${ticker}.png`} alt={ticker} />{ticker}</td>
+    <tr id={`coin-${ticker}`} onClick={onClick} style={{ cursor: 'pointer' }}>
+      <td>
+        <img className="coinLogo" src={`https://static.upbit.com/logos/${ticker}.png`} alt={ticker} />
+        {ticker}
+      </td>
       <td id={`bybit-${ticker}`}>{formatBybitPrice(data.bybitPrice)}</td>
       <td id={`upbit-${ticker}`}>{formatUpbitPrice(data.upbitPrice)}</td>
       <td id={`signed-change-rate_${ticker}`} className={signedChangeClass}>

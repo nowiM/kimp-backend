@@ -50,3 +50,25 @@ body {
 .kimpTable .container .table .tableBody .reverse {/*역프*/
   color: red;
 }
+
+.selected-coin-details {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  font-size: 21px;
+}
+
+.coinDetail {
+  display: flex;
+  justify-content: center;
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin-top: 20px;
+}
+.coinDetail h2 {
+  margin-top: 0;
+}
+
+.coinDetail p .kimp {
+  color: blue;
+}
