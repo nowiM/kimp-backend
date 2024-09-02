@@ -12,9 +12,57 @@ const { fetchExchangeRate, updateExchangeRate } = require('./api/fetch-exchangeR
 const app = express();
 const port = 8000;
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'client/build')));
 
 let exchangeRate = null;
+
+// CORS 허용
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  next();
+});
+
+// CoinMarketCap 글로벌 데이터 API
+app.get('/api/globalMarketData', async (req, res) => {
+  try {
+    const response = await fetch('https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest', {
+      method: 'GET',
+      headers: {
+        'X-CMC_PRO_API_KEY': 'a2b4a653-f9bf-45a2-a152-5359f63ea20d',
+      },
+    });
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: '/api/globalMarketData Failed to fetch data' });
+  }
+});
+
+// 업비트 KRW 코인 카운트 API
+app.get('/api/krwCoinCount', async (req, res) => {
+  try{
+    const response = await fetch('https://api.upbit.com/v1/market/all');
+    const data = await response.json();
+
+    res.json(data);
+  } catch(error) {
+    res.status(500).json({ error: '/api/krwCoinCount Failed to fetch data' });
+  }
+});
+
+// USD-KRW 환율 API
+app.get('/api/usdToKrwExchangeRate', async (req, res) => {
+  try {
+    const response = await fetch('https://currency-api.pages.dev/v1/currencies/usd.json');
+    const data = await response.json();
+
+    res.json(data);
+  } catch(error) {
+    res.status(500).json({ error: '/api/usdToKrwExchangeRate Failed to fetch data' });
+  }
+})
 
 const server = app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
