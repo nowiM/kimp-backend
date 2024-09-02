@@ -1,6 +1,7 @@
 const express = require('express');
 const WebSocket = require('ws');
 const path = require('path');
+require('dotenv').config(); // env(환경변수) 파일을 불러오기 위함 =>process.env.키값
 
 const connectUpbit = require('./websockets/upbit.js');
 const connectBybit = require('./websockets/bybit.js');
@@ -30,7 +31,7 @@ app.get('/api/globalMarketData', async (req, res) => {
     const response = await fetch('https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest', {
       method: 'GET',
       headers: {
-        'X-CMC_PRO_API_KEY': 'a2b4a653-f9bf-45a2-a152-5359f63ea20d',
+        'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY,
       },
     });
     const data = await response.json();
