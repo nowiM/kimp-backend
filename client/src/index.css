@@ -9,6 +9,11 @@ h1 {
 body {
   font-family: Arial, sans-serif;
 }
+
+.topArea {
+  display: flex;
+  justify-content: center;
+}
 .kimpTable {
   width: 100%;
   display: flex;

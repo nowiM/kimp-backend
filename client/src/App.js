@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import CoinTable from './components/CoinTable';
-import CoinDetail from './components/CoinDetail'; // Import the new CoinDetail component
+import CoinDetail from './components/CoinDetail';
 import TopArea from './components/TopArea'; 
 import './index.css';
 
 function App() {
   const [coinData, setCoinData] = useState({});
   const [exchangeRate, setExchangeRate] = useState(null);
-  const [selectedCoin, setSelectedCoin] = useState('BTC'); // Default to Bitcoin
+  const [selectedCoin, setSelectedCoin] = useState('BTC');
+  const [sortedCoinData, setSortedCoinData] = useState([]);
+  const [sortConfig, setSortConfig] = useState(() => {
+    const savedConfig = localStorage.getItem('sortConfig');
+    return savedConfig ? JSON.parse(savedConfig) : { key: 'acc_trade_price_24h', direction: 'desc' };
+  });
 
   useEffect(() => {
     const ws = new WebSocket(`ws://${window.location.hostname}:8000`);
@@ -70,13 +75,43 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const sortedData = Object.keys(coinData)
+      .map(ticker => ({ ticker, ...coinData[ticker] }))
+      .sort((a, b) => {
+        const { key, direction } = sortConfig;
+        if (direction === 'asc') {
+          return a[key] > b[key] ? 1 : -1;
+        } else {
+          return a[key] < b[key] ? 1 : -1;
+        }
+      });
+  
+    // 상태가 동일한 경우 업데이트를 방지
+    if (JSON.stringify(sortedData) !== JSON.stringify(sortedCoinData)) {
+      setSortedCoinData(sortedData);
+    }
+  }, [coinData, sortConfig, sortedCoinData]);
+  
+
+  useEffect(() => {
+    localStorage.setItem('sortConfig', JSON.stringify(sortConfig));
+  }, [sortConfig]);
+
   const handleCoinClick = (ticker) => {
     setSelectedCoin(ticker);
   };
 
+  const handleSort = (key) => {
+    setSortConfig((prevConfig) => ({
+      key,
+      direction: prevConfig.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  };
+
   return (
     <div>
-      <TopArea></TopArea>
+      <TopArea />
       <CoinDetail 
         coin={selectedCoin} 
         data={coinData[selectedCoin]} 
@@ -84,9 +119,11 @@ function App() {
       />
       <h1>Real-time Upbit & Bybit Ticker Data</h1>
       <CoinTable 
-        coinData={coinData} 
+        coinData={sortedCoinData} 
         exchangeRate={exchangeRate} 
-        onCoinClick={handleCoinClick} // Pass the click handler
+        onCoinClick={handleCoinClick} 
+        onSort={handleSort} 
+        sortConfig={sortConfig} 
       />
     </div>
   );
