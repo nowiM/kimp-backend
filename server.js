@@ -26,20 +26,20 @@ app.use((req, res, next) => {
 });
 
 // CoinMarketCap 글로벌 데이터 API
-app.get('/api/globalMarketData', async (req, res) => {
-  try {
-    const response = await fetch('https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest', {
-      method: 'GET',
-      headers: {
-        'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY,
-      },
-    });
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: '/api/globalMarketData Failed to fetch data' });
-  }
-});
+// app.get('/api/globalMarketData', async (req, res) => {
+//   try {
+//     const response = await fetch('https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest', {
+//       method: 'GET',
+//       headers: {
+//         'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY,
+//       },
+//     });
+//     const data = await response.json();
+//     res.json(data);
+//   } catch (error) {
+//     res.status(500).json({ error: '/api/globalMarketData Failed to fetch data' });
+//   }
+// });
 
 // 업비트 KRW 코인 카운트 API
 app.get('/api/krwCoinCount', async (req, res) => {
