@@ -1,17 +1,15 @@
 import React from 'react';
 import formatUpbitPrice from '../modules/formatUpbitPrice.js';
-import formatBybitPrice from '../modules/formatBybitPrice.js';
 import formatRate from '../modules/formatRate.js';
 import updatePremium from '../modules/updatePremium.js';
 
-const CoinDetail = ({ coin, data, exchangeRate }) => {
+const CoinFilterArea = ({ coin, data, exchangeRate }) => {
   if (!data) return null;
 
   const { premiumClass, premiumValue, premiumRate } = updatePremium(coin, data, exchangeRate);
 
   return (
-    <div className="coinDetail">
-        <h2>{coin} 상세 정보</h2>
+    <div className="coinFilterArea">
         <p>업비트 가격: {formatUpbitPrice(data.upbitPrice)}</p>
         <p>-</p>
         <p>바이비트 가격: {formatUpbitPrice(data.bybitPrice * exchangeRate)}</p>
@@ -21,4 +19,4 @@ const CoinDetail = ({ coin, data, exchangeRate }) => {
   );
 };
 
-export default CoinDetail;
+export default CoinFilterArea;

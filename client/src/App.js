@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import CoinTable from './components/CoinTable';
-import CoinDetail from './components/CoinDetail';
+import CoinFilterArea from './components/CoinFilterArea';
 import TopArea from './components/TopArea'; 
+import ChatApp from './components/ChatApp'; 
 import './index.css';
 
 function App() {
@@ -110,21 +111,31 @@ function App() {
   };
 
   return (
-    <div>
-      <TopArea />
-      <CoinDetail 
-        coin={selectedCoin} 
-        data={coinData[selectedCoin]} 
-        exchangeRate={exchangeRate} 
-      />
-      <h1>Real-time Upbit & Bybit Ticker Data</h1>
-      <CoinTable 
-        coinData={sortedCoinData} 
-        exchangeRate={exchangeRate} 
-        onCoinClick={handleCoinClick} 
-        onSort={handleSort} 
-        sortConfig={sortConfig} 
-      />
+    <div className='mainContainer'>
+      <div className='topArea'>
+        <TopArea />
+      </div>
+      <div className='mainContent'>
+        <div className='container'>
+          <div className='coinInfo'>
+            <CoinFilterArea 
+              coin={selectedCoin} 
+              data={coinData[selectedCoin]} 
+              exchangeRate={exchangeRate} 
+            />
+            <CoinTable 
+              coinData={sortedCoinData} 
+              exchangeRate={exchangeRate} 
+              onCoinClick={handleCoinClick} 
+              onSort={handleSort} 
+              sortConfig={sortConfig} 
+            />
+          </div>
+          <div className='chatApp'>
+            <ChatApp />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

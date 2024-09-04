@@ -70,20 +70,42 @@ const TopArea = () => {
     }, []);
 
     return (
-        <div className='topArea'>
-            <h1>TopArea</h1>
-            <span>코인: {marketData.totalKrwCoins !== null ? marketData.totalKrwCoins : 'Loading...'}</span>
-            <span>환율: {marketData.usdToKrwExchangeRate !== null ? marketData.usdToKrwExchangeRate : 'Loading...'}</span>
-            <span>
-                시가총액: {marketData.totalMarketCapUsd !== null && marketData.usdToKrwExchangeRate !== null ? (marketData.totalMarketCapUsd * marketData.usdToKrwExchangeRate / 1000000000000).toFixed(1) : 'Loading...'}
-                {marketData.marketCapChangePercent !== null ? Math.floor(marketData.marketCapChangePercent * 100) / 100 : 'Loading...'}
+        <div className='container'>
+            <span className='item'>
+                <span className='title'>코인: </span>
+                <span className='value'>
+                    {marketData.totalKrwCoins !== null ? marketData.totalKrwCoins : 'Loading...'}
+                </span>
             </span>
-            <span>
-                24시간 거래량: {marketData.totalVolume24hUsd !== null && marketData.usdToKrwExchangeRate !== null ? (marketData.totalVolume24hUsd * marketData.usdToKrwExchangeRate / 1000000000000).toFixed(2) : 'Loading...'}
-                {marketData.volumeChangePercent !== null ? Math.floor(marketData.volumeChangePercent * 100) / 100 : 'Loading...'}
+
+            <span className='item'>
+                <span className='title'>환율: </span>
+                <span className='value'>
+                    {marketData.usdToKrwExchangeRate !== null ? marketData.usdToKrwExchangeRate : 'Loading...'}
+                </span>
             </span>
-            <span>도미넌스 BTC: {marketData.btcDominance !== null ? Math.floor(marketData.btcDominance * 100) / 100 : 'Loading...'}</span>
-            <span>ETH: {marketData.ethDominance !== null ? Math.floor(marketData.ethDominance * 100) / 100 : 'Loading...'}</span>
+
+            <span className='item'>
+                <span className="title">시가총액: </span>
+                <span className="value">
+                    {marketData.totalMarketCapUsd !== null && marketData.usdToKrwExchangeRate !== null ? (marketData.totalMarketCapUsd * marketData.usdToKrwExchangeRate / 1000000000000).toFixed(1) : 'Loading...'}
+                </span>
+                <span className="rate">
+                    {marketData.marketCapChangePercent !== null ? Math.floor(marketData.marketCapChangePercent * 100) / 100 : 'Loading...'}
+                </span>
+            </span>
+
+            <span className='item'>
+                <span className="title">24시간 거래량: </span>
+                <span className="value">{marketData.totalVolume24hUsd !== null && marketData.usdToKrwExchangeRate !== null ? (marketData.totalVolume24hUsd * marketData.usdToKrwExchangeRate / 1000000000000).toFixed(2) : 'Loading...'}</span>
+                <span className="rate">{marketData.volumeChangePercent !== null ? Math.floor(marketData.volumeChangePercent * 100) / 100 : 'Loading...'}</span>
+            </span>
+
+            <span className='item'>
+            <span className="title">도미넌스: </span>
+                <span className="value">BTC {marketData.btcDominance !== null ? Math.floor(marketData.btcDominance * 100) / 100 : 'Loading...'}</span>
+                <span className="value">ETH {marketData.ethDominance !== null ? Math.floor(marketData.ethDominance * 100) / 100 : 'Loading...'}</span>
+            </span> 
         </div>
     );
 }
