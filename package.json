@@ -2,10 +2,14 @@
   "dependencies": {
     "async": "^3.2.5",
     "axios": "^1.7.3",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "http": "^0.0.1-security",
+    "mongoose": "^8.6.1",
     "node-cache": "^5.1.2",
     "node-fetch": "^3.3.2",
+    "socket.io": "^4.7.5",
     "ws": "^8.18.0"
   },
   "proxy": "http://localhost:8000"

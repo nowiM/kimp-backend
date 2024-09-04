@@ -1,6 +1,8 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const WebSocket = require('ws');
 const path = require('path');
+const cors = require('cors');
 require('dotenv').config(); // env(환경변수) 파일을 불러오기 위함 =>process.env.키값
 
 const connectUpbit = require('./websockets/upbit.js');
@@ -14,6 +16,11 @@ const app = express();
 const port = 8000;
 
 app.use(express.static(path.join(__dirname, 'client/build')));
+
+app.use(cors());
+
+//데이터베이스 연결
+mongoose.connect(process.env.DB).then(() => console.log('connected to database'))
 
 let exchangeRate = null;
 
