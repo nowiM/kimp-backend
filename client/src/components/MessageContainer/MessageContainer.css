@@ -1,6 +1,5 @@
 .system-message-container {
   display: flex;
-
   justify-content: center;
   align-items: center;
 }
@@ -13,31 +12,35 @@
   padding: 2px 15px;
   font-size: 14px;
 }
+
 .my-message-container {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 5px;
 }
+
 .my-message {
   background-color: #f7e600;
   border-radius: 8px;
   padding: 8px;
   max-width: 200px;
   font-size: 12px;
+  word-wrap: break-word; /* 긴 단어를 자동으로 줄바꿈 */
 }
 
 .your-message-container {
   display: flex;
   justify-content: flex-start;
-  /* margin-bottom: 5px; */
   align-items: center;
 }
+
 .your-message {
   background-color: white;
   border-radius: 8px;
   padding: 8px;
   max-width: 200px;
   font-size: 12px;
+  word-wrap: break-word; /* 긴 단어를 자동으로 줄바꿈 */
 }
 
 .profile-image {
