@@ -32,7 +32,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// CoinMarketCap 글로벌 데이터 API
+// CoinMarketCap 글로벌 데이터 API(요청 제한 때문에 주석 처리함)
 // app.get('/api/globalMarketData', async (req, res) => {
 //   try {
 //     const response = await fetch('https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest', {

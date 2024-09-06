@@ -1,10 +1,12 @@
 import React from 'react';
-import formatUpbitPrice from '../modules/formatUpbitPrice.js';
-import formatRate from '../modules/formatRate.js';
-import updatePremium from '../modules/updatePremium.js';
+import formatUpbitPrice from '../../modules/formatUpbitPrice';
+import formatRate from '../../modules/formatRate.js';
+import updatePremium from '../../modules/updatePremium.js';
 
-import upbitLogo from './images/logo_upbit.svg';
-import bybitLogo from './images/logo_bybit.png';
+import './CoinFilterArea.css'
+
+import upbitLogo from '../images/logo_upbit.svg';
+import bybitLogo from '../images/logo_bybit.png';
 
 const CoinFilterArea = ({ coin, data, exchangeRate }) => {
   if (!data) return null;

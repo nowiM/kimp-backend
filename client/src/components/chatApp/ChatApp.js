@@ -1,8 +1,9 @@
 // src/components/ChatApp.js
 import React, {useState, useEffect} from 'react';
-import socket from '../server.js';
-import InputField from './InputField/InputField';
-import MessageContainer from './MessageContainer/MessageContainer';
+import socket from '../../server.js';
+import InputField from '../InputField/InputField.jsx';
+import MessageContainer from '../MessageContainer/MessageContainer.js';
+import './ChatApp.css'
 
 function ChatApp() {
     const userNameArray = [
@@ -49,7 +50,7 @@ function ChatApp() {
 
     return (
         <div className="chat-app">
-            <MessageContainer messageList={messageList} user={user}/>
+            <MessageContainer messageList={messageList}/>
             <InputField message={message} setMessage={setMessage} sendMessage={sendMessage}/>
         </div>
     );

@@ -1,0 +1,33 @@
+.chatApp {
+    position: sticky;
+    flex: 3;
+    top: 40px; /* 상단에 고정 */
+    height: 500px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    background-color: white;
+    z-index: 1000; /* 다른 요소보다 앞에 오도록 설정 */
+}
+
+.chat-app {
+    height: 100%; /* 부모 컨테이너 높이를 모두 차지 */
+    display: flex;
+    flex-direction: column; /* 자식들을 세로로 배치 */
+    position: relative;
+}
+
+.messageCotainer {
+    flex: 1; /* 남은 공간을 차지하도록 설정 */
+    overflow-y: auto; /* 스크롤이 필요할 경우 스크롤 추가 */
+    padding-bottom: 60px; /* input-area의 높이만큼 공간을 확보 */
+}
+
+.input-area {
+    position: absolute; /* 절대 위치로 고정 */
+    bottom: 0; /* 부모 요소의 바닥에 고정 */
+    left: 0;
+    width: 100%; /* 부모 요소의 너비를 모두 차지 */
+    height: 60px; /* 고정된 높이 */
+    border-top: 1px solid #ccc; /* 구분선 추가 */
+    background-color: white; /* 필요에 따라 배경색 지정 */
+}

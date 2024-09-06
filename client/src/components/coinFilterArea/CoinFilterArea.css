@@ -1,0 +1,44 @@
+.mainContainer .mainContent .container .coinFilterArea {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    padding: 100px 0;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+}
+
+.mainContainer .mainContent .container .coinFilterArea .logoAndSearch {
+    display: flex;
+    align-items: center;
+}
+
+.mainContainer .mainContent .container .coinFilterArea .logoAndSearch .logo {
+    display: flex;
+    align-items: center;
+}
+
+.mainContainer .mainContent .container .coinFilterArea .logoAndSearch .logo .logoIma {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.mainContainer .mainContent .container .coinFilterArea .logoAndSearch .logo .exchange {
+    display: inline-block;
+}
+
+.mainContainer .mainContent .container .coinFilterArea .logoAndSearch .search .searchFild {
+    width: 300px;
+    height: 40px;
+    border-radius: 30px;
+    background-color: #c6cacf;
+}
+
+.mainContainer .mainContent .container .coinFilterArea .coins {
+    display: flex;
+}
+
+.coinFilterArea p .kimp {
+    color: blue;
+}

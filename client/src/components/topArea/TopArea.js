@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import triangle_icon from '../images/triangle_icon.svg';
+import './TopArea.css'
 
 const TopArea = () => {
     const [marketData, setMarketData] = useState({ 
@@ -66,8 +68,11 @@ const TopArea = () => {
     useEffect(() => {
         fetchKrwCoinCount();
         fetchUsdToKrwExchangeRate();
-        //fetchGlobalMarketData(); //API 요청 제한 때문에 주석 처리함
+        // fetchGlobalMarketData(); //API 요청 제한 때문에 주석 처리함
     }, []);
+
+    const priceDirectionTotalMarket = marketData.marketCapChangePercent !== null && marketData.marketCapChangePercent > 0 ? 'rise' : 'fall';
+    const priceDirectionTotalVolue = marketData.volumeChangePercent !== null && marketData.volumeChangePercent > 0 ? 'rise' : 'fall';
 
     return (
         <div className='container'>
@@ -90,21 +95,31 @@ const TopArea = () => {
                 <span className="value">
                     {marketData.totalMarketCapUsd !== null && marketData.usdToKrwExchangeRate !== null ? (marketData.totalMarketCapUsd * marketData.usdToKrwExchangeRate / 1000000000000).toFixed(1) : 'Loading...'}
                 </span>
-                <span className="rate">
+                <span className={`totalMarketRate ${priceDirectionTotalMarket}`}>
+                    <img className={`triangleIcon ${priceDirectionTotalMarket}`} src={triangle_icon} alt="Triangle Icon" />
                     {marketData.marketCapChangePercent !== null ? Math.floor(marketData.marketCapChangePercent * 100) / 100 : 'Loading...'}
                 </span>
             </span>
 
             <span className='item'>
                 <span className="title">24시간 거래량: </span>
-                <span className="value">{marketData.totalVolume24hUsd !== null && marketData.usdToKrwExchangeRate !== null ? (marketData.totalVolume24hUsd * marketData.usdToKrwExchangeRate / 1000000000000).toFixed(2) : 'Loading...'}</span>
-                <span className="rate">{marketData.volumeChangePercent !== null ? Math.floor(marketData.volumeChangePercent * 100) / 100 : 'Loading...'}</span>
+                <span className="value">
+                    {marketData.totalVolume24hUsd !== null && marketData.usdToKrwExchangeRate !== null ? (marketData.totalVolume24hUsd * marketData.usdToKrwExchangeRate / 1000000000000).toFixed(2) : 'Loading...'}
+                </span>
+                <span className={`totalVolueRate ${priceDirectionTotalVolue}`}>
+                    <img className={`triangleIcon ${priceDirectionTotalVolue}`} src={triangle_icon} alt="Triangle Icon" />
+                    {marketData.volumeChangePercent !== null ? Math.floor(marketData.volumeChangePercent * 100) / 100 : 'Loading...'}
+                </span>
             </span>
 
             <span className='item'>
-            <span className="title">도미넌스: </span>
-                <span className="value">BTC {marketData.btcDominance !== null ? Math.floor(marketData.btcDominance * 100) / 100 : 'Loading...'}</span>
-                <span className="value">ETH {marketData.ethDominance !== null ? Math.floor(marketData.ethDominance * 100) / 100 : 'Loading...'}</span>
+                <span className="title">도미넌스: </span>
+                <span className="value">
+                    BTC {marketData.btcDominance !== null ? Math.floor(marketData.btcDominance * 100) / 100 : 'Loading...'}
+                </span>
+                <span className="value ethDominance">
+                    ETH {marketData.ethDominance !== null ? Math.floor(marketData.ethDominance * 100) / 100 : 'Loading...'}
+                </span>
             </span> 
         </div>
     );

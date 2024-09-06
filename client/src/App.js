@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import CoinTable from './components/CoinTable';
-import CoinFilterArea from './components/CoinFilterArea';
-import TopArea from './components/TopArea'; 
-import ChatApp from './components/ChatApp'; 
+import TopArea from './components/topArea/TopArea'; 
+import CoinFilterArea from './components/coinFilterArea/CoinFilterArea';
+import CoinTable from './components/coinTable/CoinTable';
+import ChatApp from './components/chatApp/ChatApp'; 
 import './index.css';
 
 function App() {
