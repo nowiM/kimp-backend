@@ -6,26 +6,25 @@ const InputField = ({message,setMessage,sendMessage}) => {
 
   return (
     <div className="input-area">
-          <div className="plus-button">+</div>
-          <form onSubmit={sendMessage} className="input-container">
-            <Input
-              placeholder="Type in here…"
-              value={message}
-              onChange={(event) => setMessage(event.target.value)}
-              multiline={false}
-              rows={1}
-              name={'input'}
-            />
+      <form onSubmit={sendMessage} className="input-container">
+        <Input
+          placeholder="채팅을 입력하세요."
+          value={message}
+          onChange={(event) => setMessage(event.target.value)}
+          multiline={false}
+          rows={1}
+          name={'input'}
+        />
 
-            <Button
-              disabled={message === ""}
-              type="submit"
-              className="send-button"
-            >
-              전송
-            </Button>
-          </form>
-        </div>
+        <Button
+          disabled={message === ""}
+          type="submit"
+          className="send-button"
+        >
+          전송
+        </Button>
+      </form>
+    </div>
   )
 }
 

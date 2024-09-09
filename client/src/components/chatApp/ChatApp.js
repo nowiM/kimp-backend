@@ -25,7 +25,7 @@ function ChatApp() {
     }, []);
 
     const askUserName = () => {
-    const userName = userNameArray[Math.floor(Math.random() * userNameArray.length - 1)];
+    const userName = userNameArray[Math.floor(Math.random() * userNameArray.length)];
 
     // emit(대화의 제목, 보낼내용, 콜백함수)
     socket.emit('login', userName, (res) =>{
