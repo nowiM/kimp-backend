@@ -6,12 +6,11 @@
 }
 
 .kimpTable .container {
-    max-width: 1200px;
-    width: 100%;
     padding: 0 15px;
     border: 1px solid #ccc;
     border-radius: 12px;
     margin: 15px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 추가된 box-shadow */
 }
 
 .kimpTable .container .table {
@@ -22,7 +21,7 @@
 }
 
 @media (max-width: 990px) {
-    .kimpTable .container .table{
+    .kimpTable .container .table {
         font-size: 10px;
     }
 }
@@ -108,7 +107,6 @@
     margin-left: auto; /* 자동으로 왼쪽 마진을 채워서 오른쪽으로 밀기 */
 }
 
-
 .kimpTable .container .table .tableBody .rise {/*등락 --> 상승*/
     color: red;
 }
@@ -127,4 +125,8 @@
 
 .kimpTable .container .table .tableBody .reverse {/*역프*/
     color: red;
+}
+
+.kimpTable .container .table .tableBody .even {/*역프*/
+    color: black;
 }

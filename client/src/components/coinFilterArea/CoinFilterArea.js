@@ -12,7 +12,8 @@ import twoWayArrow from '../images/twoWayArrow.svg'
 const CoinFilterArea = ({ coin, data, exchangeRate }) => {
   if (!data) return null;
   const { premiumClass, premiumValue, premiumRate } = updatePremium(coin, data, exchangeRate);
-
+  const signedChangeRateClass = data.signedChangeRate > 0 ? 'rise' : data.signedChangeRate < 0 ? 'fall' : 'even';
+  
   return (
     <div className="coinFilterArea">
       <div className="logoAndSearch">
@@ -42,34 +43,38 @@ const CoinFilterArea = ({ coin, data, exchangeRate }) => {
 
           <div className="upbitPrice">
             <span className="title">업비트</span>
-            {formatUpbitPrice(data.upbitPrice)}
+            <span className="priceValue">{formatUpbitPrice(data.upbitPrice)}</span> {/* 클래스 이름 추가 */}
           </div>
+
           <div className="symbol">-</div>
+
           <div className="bybitPrice">
-          <span className="title">바이비트</span>
-            {formatUpbitPrice(data.bybitPrice * exchangeRate)}
+            <span className="title">바이비트</span>
+            <span className="priceValue">{formatUpbitPrice(data.bybitPrice * exchangeRate)}</span> {/* 클래스 이름 추가 */}
           </div>
+
           <div className="symbol">=</div>
+
           <div className="kimpPremium">
-          <span className="title">김치 프리미엄</span>
-            <span className={premiumClass}>{formatUpbitPrice(premiumValue)} ({formatRate(premiumRate)}%)</span>
+            <span className="title">김치 프리미엄</span>
+            <span className={`valueAndRate ${premiumClass}`}>{formatUpbitPrice(premiumValue)} ({formatRate(premiumRate)}%)</span> {/* 클래스 이름 수정 */}
           </div>
         </div>
 
         <div className="bottom">
           <div className="signedChangeRate">
-          <span className="title">등락</span>
-            {data.signedChangeRate > 0 ? `+${formatRate(Math.floor(data.signedChangeRate * 10000) / 100)}%` : `${formatRate(Math.floor(data.signedChangeRate * 10000) / 100)}%`}
+            <span className="title block990">등락</span>
+            <span className={`changeRateValue ${signedChangeRateClass}`}>{data.signedChangeRate > 0 ? `+${formatRate(Math.floor(data.signedChangeRate * 10000) / 100)}%` : `${formatRate(Math.floor(data.signedChangeRate * 10000) / 100)}%`}</span> {/* 클래스 이름 추가 */}
           </div>
 
           <div className="lowest52WeekPrice">
-          <span className="title">52주 최저</span>
-          {formatUpbitPrice(data.lowest_52_week_price)}
+            <span className="title block990">52주 최저</span>
+            <span className="lowestPriceValue">{formatUpbitPrice(data.lowest_52_week_price)}</span> {/* 클래스 이름 추가 */}
           </div>
 
           <div className="accTradePrice">
-          <span className="title">거래대금</span>
-            {Math.floor(data.acc_trade_price_24h / 100000000)}억
+            <span className="title block990">거래대금</span>
+            <span className="tradeVolume">{Math.floor(data.acc_trade_price_24h / 100000000)}억</span> {/* 클래스 이름 추가 */}
           </div>
         </div>
       </div>

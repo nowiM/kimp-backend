@@ -5,13 +5,15 @@
   justify-content: space-between;
 }
 
+.base-Input-root {
+  width: 80%;
+}
+
 input {
-  width: 250px;
   height: 100%;
   padding-left: 5px;
   border: none;
-  background-color:transparent;
-  word-wrap: break-word; /* 긴 단어를 자동으로 줄바꿈 */
+  background-color: transparent;
 }
 
 input:focus {
@@ -19,10 +21,10 @@ input:focus {
 }
 
 .send-button {
-  width: 50px;
+  width: 20%; /* send-button의 너비를 20%로 설정 */
   border-radius: 0;
   border: none;
-  background-color:transparent;
+  background-color: transparent;
   color: #5f5f5f;
   font-weight: 600;
 }

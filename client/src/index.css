@@ -34,7 +34,7 @@ body {
   justify-content: center;
 }
 
-.mainContainer .mainContent .container {
+.mainContainer .mainContent .container.width1200 {
   max-width: 1200px;
   width: 100%;
   display: flex;
@@ -42,42 +42,48 @@ body {
 }
 
 .mainContainer .mainContent .container .coinInfo {
-  flex: 7;
+  flex: 6.5;
 }
 
+.mainContainer .mainContent .container.chatApp {
+  flex: 3.5;
+}
+
+/* 먼저 1200px 이하 규칙 */
 @media (max-width: 1200px) {
-  .mainContainer .mainContent .container {
-    max-width: 970px;
+  .mainContainer .mainContent .container.width990 {
+    max-width: 990px;
   }
 
   .mainContainer .mainContent .container .coinInfo {
-    flex: 6.5;
+    flex: 6;
   }
 
-  .chatApp {
-    flex: 3.5;
+  .mainContainer .mainContent .container.chatApp {
+    flex: 4;
   }
 }
 
+/* 그 다음 990px 이하 규칙 */
 @media (max-width: 990px) {
-  .mainContainer .mainContent .container {
-    max-width: 750px;
-    gap: 15px;
+  .mainContainer .mainContent .container.width770 {
+    max-width: 770px;
   }
 
   .mainContainer .mainContent .container .coinInfo {
-    flex: 6.5;
+    flex: 7;
   }
 
-  .chatApp {
-    flex: 3.5;
+  .mainContainer .mainContent .container .chatApp {
+    flex: 3;
   }
 }
+
 
 
 @media (max-width: 770px) {
   /* .container에서 세로로 배치 */
-  .mainContainer .mainContent .container {
+  .mainContainer .mainContent .container.widthother {
     flex-direction: column; /* 세로 방향으로 배치 */
     gap: 10px; /* 세로 간격 설정 */
   }
@@ -88,9 +94,15 @@ body {
     width: 100%; /* 너비를 100%로 설정하여 화면 전체 차지 */
   }
 
-  .chatApp {
+  .mainContainer .mainContent .container .chatApp {
     position: relative; /* sticky 고정을 해제하고 세로 배치 */
     height: auto; /* 높이를 자동으로 설정 */
     top: 0; /* 상단에서의 거리 재설정 */
   }
+  .mainContainer .mainContent .container .coinInfo {
+    flex: 7;
+  }
 }
+
+
+

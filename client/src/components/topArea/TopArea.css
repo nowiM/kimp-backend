@@ -57,11 +57,11 @@
 
 @media (max-width: 1200px) {
     .topArea .container {
-        max-width: 970px;
+        max-width: 990px;
     }
 
     .mainContainer .mainContent .container {
-        max-width: 970px;
+        max-width: 990px;
     }
 
     .mainContainer .mainContent .container .coinInfo {
@@ -71,7 +71,7 @@
 
 @media (max-width: 990px) {
     .topArea .container {
-        max-width: 750px;
+        max-width: 770px;
         font-size: 12px;
     }
 }

@@ -116,7 +116,7 @@ function App() {
         <TopArea />
       </div>
       <div className='mainContent'>
-        <div className='container'>
+        <div className='container width1200 width990 width770 widthother'>
           <div className='coinInfo'>
             <CoinFilterArea 
               coin={selectedCoin} 

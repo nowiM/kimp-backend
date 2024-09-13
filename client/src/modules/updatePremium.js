@@ -12,7 +12,8 @@ const updatePremium = (ticker, data, exchangeRate) => {
             premiumRate = (data.upbitPrice / (data.bybitPrice * exchangeRate)) * 100 - 100; // 김프율
         }
     }
-    premiumClass = premiumRate > 0 ? "kimp" : "reverse";
+
+    premiumClass = premiumRate > 0 && data.bybitPrice ? "kimp" : premiumRate < 0 && data.bybitPrice ? "reverse" : 'even';
 
     return {premiumClass, premiumValue, premiumRate};
 }
