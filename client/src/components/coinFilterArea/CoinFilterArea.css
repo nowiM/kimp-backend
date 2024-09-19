@@ -39,7 +39,15 @@
     border-radius: 50%;
 }
 
-.mainContainer .mainContent .container .coinFilterArea .logoAndSearch .logo .bybit .logoIma.bybitBorder{
+.mainContainer .mainContent .container .coinFilterArea .logoAndSearch .logo .upbit .rightMargin {
+    margin-right: 5px;
+}
+
+.mainContainer .mainContent .container .coinFilterArea .logoAndSearch .logo .bybit .leftMargin {
+    margin-left: 5px;
+}
+
+.mainContainer .mainContent .container .coinFilterArea .logoAndSearch .logo .bybit .logoIma.bybitBorder {
     border: 1px solid #ccc;
 }
 
@@ -49,8 +57,14 @@
     margin: 0 10px;
 }
 
+.search {
+    flex-grow: 0; /* 검색 필드가 flex-grow로 확장되지 않도록 설정 */
+    flex-shrink: 0; /* 검색 필드가 화면이 작아질 때도 줄어들지 않도록 */
+}
+
 .mainContainer .mainContent .container .coinFilterArea .logoAndSearch .search .searchFild {
-    width: 250px;
+    max-width: 300px; /* 검색 입력 필드의 최대 너비 제한 */
+    width: 100%;
     height: 40px;
     border-radius: 30px;
     background-color: #e9e9e9;
@@ -123,15 +137,13 @@
     width: 100%;
 }
 
-.mainContainer .mainContent .container .coinFilterArea .coins .top .kimpPremium .vlaueAndRate {
-    text-align: center;
-}
-
 .mainContainer .mainContent .container .coinFilterArea .coins .top .kimpPremium .kimp {
+    text-align: center;
     color: blue;
 }
 
 .mainContainer .mainContent .container .coinFilterArea .coins .top .kimpPremium .reverse {
+    text-align: center;
     color: red;
 }
 
@@ -209,6 +221,7 @@
     .mainContainer .mainContent .container .coinFilterArea .coins .block990 {
         display: block;
     }
+
 }
 
 @media (max-width: 770px) {
@@ -234,4 +247,16 @@
         min-width: 100px;
         max-width: 140px;
     }
+
+    .logoAndSearch {
+        flex-direction: column; /* 작은 화면에서는 세로로 배치 */
+        align-items: flex-start;
+      }
+    
+      .search {
+        display: flex;
+        justify-content: center;
+        width: 100%; /* 검색 입력 필드가 전체 너비를 차지하도록 */
+        margin-top: 10px; /* 로고와 검색 입력 필드 사이 간격 추가 */
+      }
 }

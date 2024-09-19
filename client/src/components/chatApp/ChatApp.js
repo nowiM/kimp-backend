@@ -18,10 +18,23 @@ function ChatApp() {
     const [messageList, setMessageList] = useState([]);
 
     useEffect(() => {
-        socket.on('message', (message) => {
-        setMessageList((prevState) => prevState.concat(message));
+        // 서버로부터 과거 메시지를 받으면 messageList에 추가
+        socket.on('pastMessages', (pastMessages) => {
+            console.log(pastMessages);
+            setMessageList(pastMessages);
         });
-        askUserName();
+
+        // 새 메시지를 받을 때마다 messageList에 추가
+        socket.on('message', (newMessage) => {
+            setMessageList((prevMessages) => [...prevMessages, newMessage]);
+        });
+
+        askUserName()
+
+        return () => {
+            socket.off('pastMessages');
+            socket.off('message');
+        };
     }, []);
 
     const askUserName = () => {

@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const WebSocket = require('ws');
 const path = require('path');
 const cors = require('cors');
+const helemt = require('helmet');
 require('dotenv').config(); // env(환경변수) 파일을 불러오기 위함 =>process.env.키값
 
 const connectUpbit = require('./websockets/upbit.js');
@@ -16,6 +17,8 @@ const app = express();
 const port = 8000;
 
 app.use(express.static(path.join(__dirname, 'client/build')));
+
+app.use(helemt());
 
 app.use(cors());
 

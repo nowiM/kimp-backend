@@ -6,6 +6,12 @@ module.exports = (io) => {
     io.on('connection', async (socket) => {// 연결된 사람의 정보를 매개변수로 보내줌
         console.log('client is connected', socket.id);
 
+        //chatController.deleteAllChats();// 과거 메세지 삭제
+
+        // 클라이언트가 연결되면 과거 채팅 데이터를 보냄
+        const pastMessages = await chatController.getChats();
+        socket.emit('pastMessages', pastMessages); // 연결된 클라이언트에게 과거 메시지를 보냄
+
         socket.on('login', async (userName, cb) => {
             //console.log('backend ', userName);
 

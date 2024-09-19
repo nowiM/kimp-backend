@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import formatUpbitPrice from '../../modules/formatUpbitPrice';
 import formatRate from '../../modules/formatRate.js';
 import updatePremium from '../../modules/updatePremium.js';
@@ -9,7 +9,15 @@ import upbitLogo from '../images/logo_upbit.svg';
 import bybitLogo from '../images/logo_bybit.png';
 import twoWayArrow from '../images/twoWayArrow.svg'
 
-const CoinFilterArea = ({ coin, data, exchangeRate }) => {
+const CoinFilterArea = ({ coin, data, exchangeRate, onSearch }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    onSearch(value); // 부모 컴포넌트로 검색어 전달
+  };
+
   if (!data) return null;
   const { premiumClass, premiumValue, premiumRate } = updatePremium(coin, data, exchangeRate);
   const signedChangeRateClass = data.signedChangeRate > 0 ? 'rise' : data.signedChangeRate < 0 ? 'fall' : 'even';
@@ -19,7 +27,7 @@ const CoinFilterArea = ({ coin, data, exchangeRate }) => {
       <div className="logoAndSearch">
         <div className="logo">
           <div className="upbit" onClick={() => window.open('https://upbit.com/home', '_blank')}>
-            <span className="exchange">업비트 KRW </span>
+            <span className="exchange rightMargin">업비트 KRW</span>
             <img className="logoIma" src={upbitLogo} alt="upbit Logo" />
           </div>
 
@@ -27,11 +35,18 @@ const CoinFilterArea = ({ coin, data, exchangeRate }) => {
 
           <div className="bybit" onClick={() => window.open('https://www.bybit.com/en', '_blank')}>
             <img className="logoIma bybitBorder" src={bybitLogo} alt="bybit Logo" />
-            <span className="exchange">바이비트 USDT마켓</span>
+            <span className="exchange leftMargin">바이비트 USDT마켓</span>
           </div>
         </div>
         <div className="search">
-          <div className="searchFild"></div>
+          <input 
+            name='coinName'
+            className="searchFild"
+            type="text"
+            placeholder="코인 검색(btc, eth)"
+            value={searchTerm}
+            onChange={handleSearchChange} // 검색어 변경 시 호출
+          />
         </div>
       </div>
       <div className="coins">

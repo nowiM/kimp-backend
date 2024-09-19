@@ -20,12 +20,6 @@
     border-spacing: 0; /* 셀 간의 여백 제거 */
 }
 
-@media (max-width: 990px) {
-    .kimpTable .container .table {
-        font-size: 10px;
-    }
-}
-
 .kimpTable .container .table .tableHeader,
 .kimpTable .container .table .tableBody {
     width: 100%;
@@ -50,6 +44,11 @@
 .kimpTable .container .table td {
     border-bottom: 1px solid #ccc;
     text-align: right;
+}
+
+/* 마지막 tr의 td border 제거 */
+.kimpTable .container .table tr:last-child td {
+    border: none;
 }
 
 /* 열 별 flex 비율 조정 */
@@ -129,4 +128,10 @@
 
 .kimpTable .container .table .tableBody .even {/*역프*/
     color: black;
+}
+
+@media (max-width: 990px) {
+    .kimpTable .container .table {
+        font-size: 10px;
+    }
 }
