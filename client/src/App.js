@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import io from 'socket.io-client';
 import TopArea from './components/topArea/TopArea'; 
 import CoinFilterArea from './components/coinFilterArea/CoinFilterArea';
 import CoinTable from './components/coinTable/CoinTable';
@@ -18,77 +19,87 @@ function App() {
     return savedConfig ? JSON.parse(savedConfig) : { key: 'acc_trade_price_24h', direction: 'desc' };
   });
 
-  // WebSocket을 통해 데이터를 받아오는 로직
+  // Socket.io를 통해 데이터를 받아오는 로직
   useEffect(() => {
-    const ws = new WebSocket(`ws://${window.location.hostname}:8000`);
-    ws.onopen = () => console.log("서버와 WebSocket 연결 성공");
-  
-    ws.onmessage = (event) => {
+    const socket = io(`http://${window.location.hostname}:8000`);
+
+    socket.on('connect', () => {
+      console.log("서버와 Socket.io 연결 성공");
+    });
+
+    socket.on('initial', (message) => {
       try {
-        const message = JSON.parse(event.data);
+        setExchangeRate(message.exchangeRate);
   
-        if (message.source === "initial") {
-          setExchangeRate(message.exchangeRate);
+        const { upbit, bybit } = message.data;
+        const formattedData = {};
   
-          const { upbit, bybit } = message.data;
-          const formattedData = {};
+        for (const ticker in upbit) {
+          const upbitData = upbit[ticker];
+          const bybitData = bybit[ticker] || { price: null };
   
-          for (const ticker in upbit) {
-            const upbitData = upbit[ticker];
-            const bybitData = bybit[ticker] || { price: null };
-  
-            formattedData[ticker] = {
-              ticker: ticker,
-              upbitPrice: upbitData.price,
-              bybitPrice: bybitData.price,
-              signedChangeRate: upbitData.signedChangeRate,
-              lowest_52_week_price: upbitData.lowest_52_week_price,
-              acc_trade_price_24h: upbitData.acc_trade_price_24h,
-            };
-          }
-  
-          setCoinData(formattedData); // 초기 데이터는 비교 없이 바로 설정
-        } 
-        // 환율 업데이트 처리
-        else if (message.source === "exchangeRateUpdate") {
-          setExchangeRate(message.exchangeRate);
-        } 
-        // 실시간 코인 가격 업데이트
-        else if (message.source === "upbit" || message.source === "bybit") {
-          const { ticker, price, signedChangeRate, acc_trade_price_24h } = message;
-  
-          setCoinData((prevData) => {
-            const updatedData = { ...prevData };
-  
-            if (!updatedData[ticker]) {
-              updatedData[ticker] = { upbitPrice: null, bybitPrice: null, signedChangeRate: null, acc_trade_price_24h: null };
-            }
-  
-            if (message.source === "bybit") {
-              updatedData[ticker].bybitPrice = price;
-            } else if (message.source === "upbit") {
-              updatedData[ticker].upbitPrice = price;
-              updatedData[ticker].signedChangeRate = signedChangeRate;
-              updatedData[ticker].acc_trade_price_24h = acc_trade_price_24h;
-            }
-  
-            return updatedData;
-          });
+          formattedData[ticker] = {
+            ticker: ticker,
+            upbitPrice: upbitData.price,
+            bybitPrice: bybitData.price,
+            signedChangeRate: upbitData.signedChangeRate,
+            lowest_52_week_price: upbitData.lowest_52_week_price,
+            acc_trade_price_24h: upbitData.acc_trade_price_24h,
+          };
         }
+  
+        setCoinData(formattedData); // 초기 데이터는 비교 없이 바로 설정
       } catch (error) {
-        console.error("Error parsing JSON:", error);
+        console.error("Error parsing initial data:", error);
       }
-    };
+    });
+
+    socket.on('upbit', (message) => {
+      const { ticker, price, signedChangeRate, acc_trade_price_24h } = message;
   
-    ws.onerror = (error) => console.error("WebSocket 오류:", error);
-    ws.onclose = () => console.log("WebSocket 연결 종료");
+      setCoinData((prevData) => {
+        const updatedData = { ...prevData };
+
+        if (!updatedData[ticker]) {
+          updatedData[ticker] = { upbitPrice: null, bybitPrice: null, signedChangeRate: null, acc_trade_price_24h: null };
+        }
+
+        updatedData[ticker].upbitPrice = price;
+        updatedData[ticker].signedChangeRate = signedChangeRate;
+        updatedData[ticker].acc_trade_price_24h = acc_trade_price_24h;
   
+        return updatedData;
+      });
+    });
+
+    socket.on('bybit', (message) => {
+      const { ticker, price } = message;
+  
+      setCoinData((prevData) => {
+        const updatedData = { ...prevData };
+
+        if (!updatedData[ticker]) {
+          updatedData[ticker] = { upbitPrice: null, bybitPrice: null, signedChangeRate: null, acc_trade_price_24h: null };
+        }
+
+        updatedData[ticker].bybitPrice = price;
+  
+        return updatedData;
+      });
+    });
+
+    socket.on('exchangeRateUpdate', (message) => {
+      setExchangeRate(message.exchangeRate);
+    });
+
+    socket.on('disconnect', () => {
+      console.log("서버와의 연결이 끊어졌습니다.");
+    });
+
     return () => {
-      ws.close();
+      socket.disconnect();
     };
   }, []);
-  
-  
 
   // 코인 데이터를 정렬하는 로직
   useEffect(() => {
@@ -112,12 +123,9 @@ function App() {
           return a[key] < b[key] ? 1 : -1;
         }
       });
-  
-    // 상태가 동일한 경우 업데이트를 방지
-    if (JSON.stringify(sortedData) !== JSON.stringify(sortedCoinData)) {
-      setSortedCoinData(sortedData);
-    }
-  }, [coinData, sortConfig, sortedCoinData, searchTerm]); // 검색어 추가
+
+    setSortedCoinData(sortedData);
+  }, [coinData, sortConfig, searchTerm, exchangeRate]);
 
   useEffect(() => {
     localStorage.setItem('sortConfig', JSON.stringify(sortConfig));

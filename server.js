@@ -1,31 +1,29 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const WebSocket = require('ws');
 const path = require('path');
 const cors = require('cors');
-const helemt = require('helmet');
-require('dotenv').config(); // env(환경변수) 파일을 불러오기 위함 =>process.env.키값
+const helmet = require('helmet');
+const { createServer } = require('http'); // http 서버 생성
+const { Server } = require('socket.io'); // socket.io 서버 생성
+require('dotenv').config(); // 환경 변수 불러오기
 
+// 업비트, 바이비트, 환율 관련 모듈 불러오기
 const connectUpbit = require('./websockets/upbit.js');
 const connectBybit = require('./websockets/bybit.js');
-
 const fetchUpbitTickers = require('./api/fetch-upbit-tickers.js');
 const fetchBybitTickers = require('./api/fetch-bybit-tickers.js');
 const { fetchExchangeRate, updateExchangeRate } = require('./api/fetch-exchangeRate.js');
 
-const app = express();
-const port = 8000;
+const app = express(); // express 앱 생성
+const port = process.env.PORT; // 포트 설정 (환경 변수 또는 기본값 8000)
 
-app.use(express.static(path.join(__dirname, 'client/build')));
+// 미들웨어 설정
+app.use(express.static(path.join(__dirname, 'client/build'))); // React 빌드 파일 제공
+app.use(helmet()); // 보안 강화
+app.use(cors()); // CORS 설정
 
-app.use(helemt());
-
-app.use(cors());
-
-//데이터베이스 연결
-mongoose.connect(process.env.DB).then(() => console.log('connected to database'))
-
-let exchangeRate = null;
+// MongoDB 연결
+mongoose.connect(process.env.DB).then(() => console.log('connected to database'));
 
 // CORS 허용
 app.use((req, res, next) => {
@@ -35,30 +33,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// CoinMarketCap 글로벌 데이터 API(요청 제한 때문에 주석 처리함)
-// app.get('/api/globalMarketData', async (req, res) => {
-//   try {
-//     const response = await fetch('https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest', {
-//       method: 'GET',
-//       headers: {
-//         'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY,
-//       },
-//     });
-//     const data = await response.json();
-//     res.json(data);
-//   } catch (error) {
-//     res.status(500).json({ error: '/api/globalMarketData Failed to fetch data' });
-//   }
-// });
-
 // 업비트 KRW 코인 카운트 API
 app.get('/api/krwCoinCount', async (req, res) => {
-  try{
+  try {
     const response = await fetch('https://api.upbit.com/v1/market/all');
     const data = await response.json();
 
     res.json(data);
-  } catch(error) {
+  } catch (error) {
     res.status(500).json({ error: '/api/krwCoinCount Failed to fetch data' });
   }
 });
@@ -70,54 +52,63 @@ app.get('/api/usdToKrwExchangeRate', async (req, res) => {
     const data = await response.json();
 
     res.json(data);
-  } catch(error) {
+  } catch (error) {
     res.status(500).json({ error: '/api/usdToKrwExchangeRate Failed to fetch data' });
   }
-})
-
-const server = app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
 });
 
-const wss = new WebSocket.Server({ server });
+// 정적 파일 서빙
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client/build/index.html')); // React 앱 처리
+});
 
-// 서버 시작 시 최초로 환율을 가져오고, 이후 6시간마다 갱신
-(async () => {
-  exchangeRate = await fetchExchangeRate();
-  setInterval(() => updateExchangeRate(wss), (6 * 60 * 60 * 1000) + (5 * 1000)); // 6시간 5초마다 실행
-})();
+// http 서버와 Socket.io 서버를 통합하여 생성
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:3000', // 클라이언트 주소에 맞춰서 수정
+    methods: ['GET', 'POST'],
+  },
+});
 
-// 각 거래소에서 받은 데이터를 저장할 객체
+// WebSocket 서버 로직을 Socket.io로 대체
+let exchangeRate = null;
 const coinData = {
   upbit: {},
-  bybit: {}
+  bybit: {},
 };
 
-// 서버 시작 시 업비트와 바이비트 웹소켓 연결을 시작하여 지속적으로 데이터 수집
+// 환율 가져오기 및 주기적 업데이트
+(async () => {
+  exchangeRate = await fetchExchangeRate();
+  setInterval(() => updateExchangeRate(io), (6 * 60 * 60 * 1000) + (5 * 1000)); // 6시간마다 환율 갱신
+})();
+
+// 업비트, 바이비트 웹소켓 연결 (Socket.io 사용)
 (async () => {
   const upbitTickers = await fetchUpbitTickers();
   const bybitTickers = await fetchBybitTickers();
 
-  connectUpbit(coinData, upbitTickers, wss);
-  connectBybit(coinData, bybitTickers, wss);
+  connectUpbit(coinData, upbitTickers, io);
+  connectBybit(coinData, bybitTickers, io);
 })();
 
-wss.on('connection', (ws) => {
+// Socket.io 클라이언트 연결 처리
+io.on('connection', (socket) => {
   console.log('Client connected');
 
-  // 수집된 데이터를 거래대금 내림차순으로 정렬한다
+  // 최초 데이터 전송
   const sortedData = Object.keys(coinData.upbit)
     .map(ticker => ({
       ticker,
       upbit: coinData.upbit[ticker],
-      bybit: coinData.bybit[ticker] || null
+      bybit: coinData.bybit[ticker] || null,
     }))
     .sort((a, b) => (b.upbit.acc_trade_price_24h || 0) - (a.upbit.acc_trade_price_24h || 0));
 
-  // 클라이언트가 연결될 때 서버에서 수집된 최신 데이터를 정렬 후 클라이언트에 전달
   const sortedCoinData = {
     upbit: {},
-    bybit: {}
+    bybit: {},
   };
 
   sortedData.forEach(({ ticker, upbit, bybit }) => {
@@ -125,13 +116,21 @@ wss.on('connection', (ws) => {
     sortedCoinData.bybit[ticker] = bybit;
   });
 
-  ws.send(JSON.stringify({
+  socket.emit('initial', {
     source: 'initial',
     data: sortedCoinData,
-    exchangeRate
-  }));
+    exchangeRate,
+  });
 
-  ws.on('close', () => {
+  socket.on('disconnect', () => {
     console.log('Client disconnected');
   });
+});
+
+// Socket.io를 활용한 채팅 기능 처리
+require('./utils/io.js')(io); // io를 인자로 넘겨준다.
+
+// 서버 시작
+server.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
 });
