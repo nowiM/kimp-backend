@@ -25,7 +25,7 @@ app.use(helmet()); // 보안 강화
 app.use(cors({
   origin: 'https://web-kimp-frontend-m1ek7q6w89a39f99.sel4.cloudtype.app', // CORS 문제 해결: trailing slash 제거
   methods: ['GET', 'POST'],
-  credentials: true // 인증 정보 사용 시 필요
+  //credentials: true // 인증 정보 사용 시 필요
 })); // CORS 설정
 
 // MongoDB 연결
