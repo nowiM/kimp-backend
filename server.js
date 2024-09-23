@@ -13,12 +13,8 @@ const fetchUpbitTickers = require('./api/fetch-upbit-tickers.js');
 const fetchBybitTickers = require('./api/fetch-bybit-tickers.js');
 const { fetchExchangeRate, updateExchangeRate } = require('./api/fetch-exchangeRate.js');
 
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config(); //환경변수 불러오기
-}
-
 const app = express(); // express 앱 생성
-const PORT = process.env.PORT; // 포트 설정 (환경 변수 또는 기본값 8000)
+const PORT = process.env.PORT || 8000;; // 포트 설정 (환경 변수 또는 기본값 8000)
 
 // 미들웨어 설정
 app.use(express.static(path.join(__dirname, 'client/build'))); // React 빌드 파일 제공
