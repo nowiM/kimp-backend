@@ -21,9 +21,11 @@ const app = express(); // express 앱 생성
 const PORT = process.env.PORT; // 포트 설정 (환경 변수 또는 기본값 8000)
 
 // 미들웨어 설정
-app.use(express.static(path.join(__dirname, 'client/build'))); // React 빌드 파일 제공
 app.use(helmet()); // 보안 강화
-app.use(cors()); // CORS 설정
+app.use(cors({
+  origin: 'https://web-kimp-frontend-m1ek7q6w89a39f99.sel4.cloudtype.app/',
+  methods: ['GET', 'POST'],
+})); // CORS 설정
 
 // MongoDB 연결
 mongoose.connect(process.env.DB).then(() => console.log('connected to database'));
@@ -58,11 +60,6 @@ app.get('/api/usdToKrwExchangeRate', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: '/api/usdToKrwExchangeRate Failed to fetch data' });
   }
-});
-
-// 정적 파일 서빙
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client/build/index.html')); // React 앱 처리
 });
 
 // http 서버와 Socket.io 서버를 통합하여 생성
