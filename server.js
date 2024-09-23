@@ -5,7 +5,6 @@ const cors = require('cors');
 const helmet = require('helmet');
 const { createServer } = require('http'); // http 서버 생성
 const { Server } = require('socket.io'); // socket.io 서버 생성
-require('dotenv').config(); // 환경 변수 불러오기
 
 // 업비트, 바이비트, 환율 관련 모듈 불러오기
 const connectUpbit = require('./websockets/upbit.js');
@@ -13,6 +12,10 @@ const connectBybit = require('./websockets/bybit.js');
 const fetchUpbitTickers = require('./api/fetch-upbit-tickers.js');
 const fetchBybitTickers = require('./api/fetch-bybit-tickers.js');
 const { fetchExchangeRate, updateExchangeRate } = require('./api/fetch-exchangeRate.js');
+
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config(); //환경변수 불러오기
+}
 
 const app = express(); // express 앱 생성
 const PORT = process.env.PORT; // 포트 설정 (환경 변수 또는 기본값 8000)
