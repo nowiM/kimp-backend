@@ -1,4 +1,14 @@
 {
+  "name": "kimp",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "client": "npm start --prefix client",
+    "server": "nodemon server.js",          
+    "dev": "concurrently \"npm run server\" \"npm run client\"", 
+    "build": "npm run build --prefix client"  
+  },
   "dependencies": {
     "async": "^3.2.5",
     "axios": "^1.7.3",
@@ -12,6 +22,5 @@
     "node-fetch": "^3.3.2",
     "socket.io": "^4.7.5",
     "ws": "^8.18.0"
-  },
-  "proxy": "http://localhost:8000"
+  }
 }

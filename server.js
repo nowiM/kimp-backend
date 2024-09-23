@@ -15,7 +15,7 @@ const fetchBybitTickers = require('./api/fetch-bybit-tickers.js');
 const { fetchExchangeRate, updateExchangeRate } = require('./api/fetch-exchangeRate.js');
 
 const app = express(); // express 앱 생성
-const port = process.env.PORT; // 포트 설정 (환경 변수 또는 기본값 8000)
+const PORT = process.env.PORT; // 포트 설정 (환경 변수 또는 기본값 8000)
 
 // 미들웨어 설정
 app.use(express.static(path.join(__dirname, 'client/build'))); // React 빌드 파일 제공
@@ -131,6 +131,6 @@ io.on('connection', (socket) => {
 require('./utils/io.js')(io); // io를 인자로 넘겨준다.
 
 // 서버 시작
-server.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+server.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
