@@ -66,7 +66,7 @@ app.get('/api/usdToKrwExchangeRate', async (req, res) => {
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000', // 클라이언트 주소에 맞춰서 수정
+    origin: 'https://web-kimp-frontend-m1ek7q6w89a39f99.sel4.cloudtype.app/', // 클라이언트 주소에 맞춰서 수정
     methods: ['GET', 'POST'],
   },
 });
