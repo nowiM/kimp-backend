@@ -6,7 +6,6 @@
     "start": "node server.js",
     "client": "npm start --prefix client",
     "server": "nodemon server.js",          
-    "dev": "concurrently \"npm run server\" \"npm run client\"", 
     "build": "npm run build --prefix client"  
   },
   "dependencies": {
