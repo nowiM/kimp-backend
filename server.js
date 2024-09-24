@@ -31,6 +31,22 @@ app.use(cors({
 // MongoDB 연결
 mongoose.connect(process.env.DB).then(() => console.log('connected to database'));
 
+// CoinMarketCap 글로벌 데이터 API(요청 제한 때문에 주석 처리함)
+// app.get('/api/globalMarketData', async (req, res) => {
+//   try {
+//     const response = await fetch('https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest', {
+//       method: 'GET',
+//       headers: {
+//         'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY,
+//       },
+//     });
+//     const data = await response.json();
+//     res.json(data);
+//   } catch (error) {
+//     res.status(500).json({ error: '/api/globalMarketData Failed to fetch data' });
+//   }
+// });
+
 // API 경로 정의
 app.get('/api/krwCoinCount', async (req, res) => {
   try {
