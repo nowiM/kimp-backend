@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 8000; // 포트 설정 (환경 변수 또는 �
 // 미들웨어 설정
 app.use(helmet()); // 보안 강화
 app.use(cors({
-  origin: 'https://web-kimp-frontend-m1ek7q6w89a39f99.sel4.cloudtype.app', // CORS 문제 해결: trailing slash 제거
+  origin: /https:\/\/(www\.)?kimpviewer\.com$/, // CORS 문제 해결: trailing slash 제거
   methods: ['GET', 'POST'],
   //credentials: true // 인증 정보 사용 시 필요
 })); // CORS 설정
@@ -72,7 +72,7 @@ app.get('/api/usdToKrwExchangeRate', async (req, res) => {
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'https://web-kimp-frontend-m1ek7q6w89a39f99.sel4.cloudtype.app', // 클라이언트 주소에 맞춰서 수정
+    origin: /https:\/\/(www\.)?kimpviewer\.com$/, // 클라이언트 주소에 맞춰서 수정
     methods: ['GET', 'POST'],
     credentials: true // 인증 정보 사용 시 필요
   },
