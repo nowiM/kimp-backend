@@ -23,13 +23,14 @@ const PORT = process.env.PORT || 8000; // 포트 설정 (환경 변수 또는 �
 // 미들웨어 설정
 app.use(helmet()); // 보안 강화
 app.use(cors({
-  origin: 'https://web-kimp-frontend-m1ek7q6w89a39f99.sel4.cloudtype.app', // CORS 문제 해결: trailing slash 제거
+  origin: process.env.FRONET_URL || process.env.LOCALHOST_URL,
   methods: ['GET', 'POST'],
   //credentials: true // 인증 정보 사용 시 필요
 })); // CORS 설정
 
 // MongoDB 연결
 mongoose.connect(process.env.DB).then(() => console.log('connected to database'));
+
 
 // CoinMarketCap 글로벌 데이터 API(요청 제한 때문에 주석 처리함)
 // app.get('/api/globalMarketData', async (req, res) => {
@@ -72,7 +73,7 @@ app.get('/api/usdToKrwExchangeRate', async (req, res) => {
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'https://web-kimp-frontend-m1ek7q6w89a39f99.sel4.cloudtype.app', // 클라이언트 주소에 맞춰서 수정
+    origin: process.env.FRONET_URL || process.env.LOCALHOST_URL,
     methods: ['GET', 'POST'],
     credentials: true // 인증 정보 사용 시 필요
   },
