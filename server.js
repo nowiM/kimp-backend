@@ -23,7 +23,9 @@ const PORT = process.env.PORT || 8000; // 포트 설정 (환경 변수 또는 �
 // 미들웨어 설정
 app.use(helmet()); // 보안 강화
 app.use(cors({
-  origin: process.env.FRONET_URL || process.env.LOCALHOST_URL,
+  origin: process.env.NODE_ENV === 'production' 
+    ? process.env.FRONET_URL 
+    : process.env.LOCALHOST_URL,
   methods: ['GET', 'POST'],
   //credentials: true // 인증 정보 사용 시 필요
 })); // CORS 설정
@@ -73,7 +75,9 @@ app.get('/api/usdToKrwExchangeRate', async (req, res) => {
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONET_URL || process.env.LOCALHOST_URL,
+    origin: process.env.NODE_ENV === 'production' 
+      ? process.env.FRONET_URL 
+      : process.env.LOCALHOST_URL,
     methods: ['GET', 'POST'],
     credentials: true // 인증 정보 사용 시 필요
   },
