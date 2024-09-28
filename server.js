@@ -5,6 +5,10 @@ const cors = require('cors');
 const helmet = require('helmet');
 const { createServer } = require('http'); // http 서버 생성
 const { Server } = require('socket.io'); // socket.io 서버 생성
+const fs = require('fs');
+const React = require('react');
+const ReactDOMServer = require('react-dom/server');
+const App = require('./src/App').default; // SSR용 React App 컴포넌트
 
 // 업비트, 바이비트, 환율 관련 모듈 불러오기
 const connectUpbit = require('./websockets/upbit.js');
@@ -25,27 +29,13 @@ app.use(helmet()); // 보안 강화
 app.use(cors({
   origin: /https:\/\/(www\.)?kimpviewer\.com$/, // CORS 문제 해결: trailing slash 제거
   methods: ['GET', 'POST'],
-  //credentials: true // 인증 정보 사용 시 필요
-})); // CORS 설정
+}));
 
 // MongoDB 연결
 mongoose.connect(process.env.DB).then(() => console.log('connected to database'));
 
-// CoinMarketCap 글로벌 데이터 API(요청 제한 때문에 주석 처리함)
-// app.get('/api/globalMarketData', async (req, res) => {
-//   try {
-//     const response = await fetch('https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest', {
-//       method: 'GET',
-//       headers: {
-//         'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY,
-//       },
-//     });
-//     const data = await response.json();
-//     res.json(data);
-//   } catch (error) {
-//     res.status(500).json({ error: '/api/globalMarketData Failed to fetch data' });
-//   }
-// });
+// 정적 파일 제공 (build 폴더 사용)
+app.use(express.static(path.resolve(__dirname, 'build')));
 
 // API 경로 정의
 app.get('/api/krwCoinCount', async (req, res) => {
@@ -66,6 +56,24 @@ app.get('/api/usdToKrwExchangeRate', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: '/api/usdToKrwExchangeRate Failed to fetch data' });
   }
+});
+
+// React SSR 설정
+app.get('*', (req, res) => {
+  const appString = ReactDOMServer.renderToString(React.createElement(App)); // React 컴포넌트 렌더링
+
+  const indexFile = path.resolve(__dirname, 'build/index.html');
+  fs.readFile(indexFile, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Could not read index file:', err);
+      return res.status(500).send('Error loading app');
+    }
+
+    // 렌더링된 React HTML을 정적 HTML 파일에 삽입
+    return res.send(
+      data.replace('<div id="root"></div>', `<div id="root">${appString}</div>`)
+    );
+  });
 });
 
 // http 서버와 Socket.io 서버를 통합하여 생성
