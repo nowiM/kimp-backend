@@ -8,7 +8,7 @@ const { Server } = require('socket.io'); // socket.io 서버 생성
 const fs = require('fs');
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
-const App = require('./src/App').default; // SSR용 React App 컴포넌트
+const App = require('./build/App').default; // 빌드된 React App 컴포넌트 사용
 
 // 업비트, 바이비트, 환율 관련 모듈 불러오기
 const connectUpbit = require('./websockets/upbit.js');
@@ -18,7 +18,7 @@ const fetchBybitTickers = require('./api/fetch-bybit-tickers.js');
 const { fetchExchangeRate, updateExchangeRate } = require('./api/fetch-exchangeRate.js');
 
 if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config(); //환경변수 불러오기
+  require('dotenv').config(); // 환경 변수 불러오기
 }
 
 const app = express(); // express 앱 생성
