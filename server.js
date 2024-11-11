@@ -92,7 +92,7 @@ const coinData = {
 
 (async () => {
   exchangeRate = await fetchExchangeRate();
-  setInterval(() => updateExchangeRate(io), 5 * 60 * 1000); // 5분마다 환율 갱신
+  setInterval(() => updateExchangeRate(io), 60 * 60 * 1000); // 6분마다 환율 갱신
 })();
 
 // 업비트, 바이비트 웹소켓 연결 (Socket.io 사용)
@@ -128,6 +128,7 @@ io.on('connection', (socket) => {
     console.log('Client disconnected');
   });
 });
+
 
 // Socket.io를 활용한 채팅 기능 처리
 require('./utils/io.js')(io); // io를 인자로 넘겨준다.
