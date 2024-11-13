@@ -27,7 +27,6 @@ async function fetchExchangeRate() {
         const response = await sheets.spreadsheets.values.get(request);
         const rows = response.data.values;
         if (rows.length) {
-            console.log('구글 달러환율 : ', rows[0][0]);
             return rows[0][0]; // 환율 값 반환
         } else {
             console.log('No data found.');
