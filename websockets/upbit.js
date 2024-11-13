@@ -7,7 +7,7 @@ function connectUpbit(coinData, tickers, io) {
   // throttle 적용: 1초에 한 번씩 클라이언트로 데이터 전송
   const throttledEmit = _.throttle((ticker, upbitData) => {
     io.emit('upbit', { ticker, ...upbitData });
-  }, 100); // 0.1초에 한 번씩만 emit
+  }, 2000); // 0.1초에 한 번씩만 emit
 
   upbitSocket.on('open', () => {
     console.log('Connected to Upbit WebSocket');

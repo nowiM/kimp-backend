@@ -92,7 +92,7 @@ const coinData = {
 
 (async () => {
   exchangeRate = await fetchExchangeRate();
-  setInterval(() => updateExchangeRate(io), 60 * 60 * 1000); // 6분마다 환율 갱신
+  setInterval(() => updateExchangeRate(io), 10 * 1000); // 6분마다 환율 갱신
 })();
 
 // 업비트, 바이비트 웹소켓 연결 (Socket.io 사용)
