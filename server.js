@@ -84,15 +84,15 @@ const io = new Server(server, {
 });
 
 // 환율 가져오기 및 주기적 업데이트
-let exchangeRate = null;
+let exchangeRate = {value: null};
 const coinData = {
   upbit: {},
   bybit: {},
 };
 
 (async () => {
-  exchangeRate = await fetchExchangeRate();
-  setInterval(() => updateExchangeRate(io), 10 * 1000); // 6분마다 환율 갱신
+  exchangeRate.value = await fetchExchangeRate();
+  setInterval(() => updateExchangeRate(io, exchangeRate), 75 * 1000); //1분 15초마다 업데이트
 })();
 
 // 업비트, 바이비트 웹소켓 연결 (Socket.io 사용)
@@ -122,7 +122,7 @@ io.on('connection', (socket) => {
     sortedCoinData.bybit[ticker] = bybit;
   });
 
-  socket.emit('initial', { source: 'initial', data: sortedCoinData, exchangeRate });
+  socket.emit('initial', { source: 'initial', data: sortedCoinData, exchangeRate: exchangeRate.value });
 
   socket.on('disconnect', () => {
     console.log('Client disconnected');
