@@ -38,9 +38,12 @@ async function fetchExchangeRate() {
     }
 }
 
-const updateExchangeRate = async (io) => {
+const updateExchangeRate = async (io, exchangeRateVar) => {
     const exchangeRate = await fetchExchangeRate();
     if (exchangeRate) {
+        // 전역 변수를 업데이트
+        exchangeRateVar.value = exchangeRate;
+
         // 업데이트된 환율 값을 모든 클라이언트에 전송
         io.sockets.sockets.forEach(socket => {
             socket.emit('exchangeRateUpdate', { source: 'exchangeRateUpdate', exchangeRate });
