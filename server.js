@@ -21,37 +21,12 @@ app.use(cors({
   //origin: /https:\/\/(www\.)?kimpviewer\.com$/, // CORS 문제 해결: trailing slash 제거
   origin: process.env.CLIENT_URL,
   methods: ['GET', 'POST'],
-  //credentials: true // 인증 정보 사용 시 필요
 })); // CORS 설정
 
 // MongoDB 연결
 mongoose.connect(process.env.DB).then(() => console.log('connected to database'));
 
-// // CORS 허용
-// app.use((req, res, next) => {
-//   res.header('Access-Control-Allow-Origin', '*');
-//   res.header('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
-//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-//   next();
-// });
-
-// // CoinMarketCap 글로벌 데이터 API(요청 제한 때문에 주석 처리함)
-// app.get('/api/globalMarketData', async (req, res) => {
-//   try {
-//     const response = await fetch('https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest', {
-//       method: 'GET',
-//       headers: {
-//         'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY,
-//       },
-//     });
-//     const data = await response.json();
-//     res.json(data);
-//   } catch (error) {
-//     res.status(500).json({ error: '/api/globalMarketData Failed to fetch data' });
-//   }
-// });
-
-// API 경로 정의
+// 원화마켓 코인의 개수 API
 app.get('/api/krwCoinCount', async (req, res) => {
   try {
     const response = await fetch('https://api.upbit.com/v1/market/all');
@@ -62,24 +37,29 @@ app.get('/api/krwCoinCount', async (req, res) => {
   }
 });
 
-app.get('/api/usdToKrwExchangeRate', async (req, res) => {
+// CoinMarketCap 글로벌 데이터 API(요청 제한 때문에 주석 처리함)
+app.get('/api/globalMarketData', async (req, res) => {
   try {
-    const response = await fetch('https://currency-api.pages.dev/v1/currencies/usd.json');
+    const response = await fetch('https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest', {
+      method: 'GET',
+      headers: {
+        'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY,
+      },
+    });
     const data = await response.json();
     res.json(data);
   } catch (error) {
-    res.status(500).json({ error: '/api/usdToKrwExchangeRate Failed to fetch data' });
+    res.status(500).json({ error: '/api/globalMarketData Failed to fetch data' });
   }
 });
+
 
 // http 서버와 Socket.io 서버를 통합하여 생성
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    //origin: /https:\/\/(www\.)?kimpviewer\.com$/, // 클라이언트 주소에 맞춰서 수정
     origin: process.env.CLIENT_URL,
     methods: ['GET', 'POST'],
-    credentials: true // 인증 정보 사용 시 필요
   },
 });
 
