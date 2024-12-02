@@ -29,6 +29,7 @@ API 요청을 통해 데이터를 확인할 수 있습니다:
 ```bash
 GET /api/fetch-upbit-tickers
 GET /api/fetch-exchangeRate
+```
 
 ## 구조
 kimp-backend/
@@ -39,6 +40,15 @@ kimp-backend/
 ├── controllers/             # 비즈니스 로직을 처리하는 컨트롤러
 │   ├── chat.controller.js
 │   └── user.controller.js
+├── models/                  # DB 개념 스키마
+│   ├── chat.js
+│   └── user.js
+├── utils/                   # socket.IO와 DB와 컨트롤러
+│   ├── io.js    
+├── websockets/              # 각 각의 거래소 웹소켓 연결
+│   ├── bybit.js
+│   ├── upbit.js
+    └── reconnectWebSocket.js
 ├── .env                     # 환경 변수 설정 파일
 ├── package.json             # 프로젝트 메타데이터 및 의존성 관리
 ├── server.js                # 서버 초기화 및 설정
