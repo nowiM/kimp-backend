@@ -5,8 +5,6 @@
 
 ---
 
-## 데모 (Demo)
-
 ### 주요 기능
 - 실시간 암호화폐 데이터 수집 및 처리
 - 김프/역프 계산 및 제공
@@ -15,17 +13,19 @@
 
 ---
 
-### 사용 예시
-API 요청을 통해 데이터를 확인할 수 있습니다:
-```bash
-GET /api/fetch-upbit-tickers
-GET /api/fetch-exchangeRate
-
 기술 스택 (Tech Stack)
 백엔드 프레임워크: Node.js, Express
 데이터베이스: MongoDB
 실시간 데이터 처리: WebSocket
 데이터 요청: Axios
+
+---
+
+### 사용 예시
+API 요청을 통해 데이터를 확인할 수 있습니다:
+```bash
+GET /api/fetch-upbit-tickers
+GET /api/fetch-exchangeRate
 
 ---
 
