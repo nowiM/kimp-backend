@@ -32,6 +32,7 @@ GET /api/fetch-exchangeRate
 ```
 
 ## 구조
+```bash
 kimp-backend/
 ├── api/                     # 데이터 수집 관련 API
 │   ├── fetch-bybit-tickers.js
@@ -53,3 +54,4 @@ kimp-backend/
 ├── package.json             # 프로젝트 메타데이터 및 의존성 관리
 ├── server.js                # 서버 초기화 및 설정
 └── README.md                # 프로젝트 설명서
+```
