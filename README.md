@@ -13,6 +13,8 @@
 - 환율 데이터 업데이트
 - 웹소켓을 통한 실시간 데이터 전송
 
+---
+
 ### 사용 예시
 API 요청을 통해 데이터를 확인할 수 있습니다:
 ```bash
@@ -24,6 +26,8 @@ GET /api/fetch-exchangeRate
 데이터베이스: MongoDB
 실시간 데이터 처리: WebSocket
 데이터 요청: Axios
+
+---
 
 구조 (Project Structure)
 kimp-backend/
