@@ -53,7 +53,6 @@ app.get('/api/globalMarketData', async (req, res) => {
   }
 });
 
-
 // http 서버와 Socket.io 서버를 통합하여 생성
 const server = createServer(app);
 const io = new Server(server, {
@@ -83,35 +82,11 @@ const coinData = {
   connectBybit(coinData, bybitTickers, io);
 })();
 
-// Socket.io 클라이언트 연결 처리
-io.on('connection', (socket) => {
-  console.log('Client connected');
-
-  const sortedData = Object.keys(coinData.upbit)
-    .map(ticker => ({
-      ticker,
-      upbit: coinData.upbit[ticker],
-      bybit: coinData.bybit[ticker] || null,
-    }))
-    .sort((a, b) => (b.upbit.acc_trade_price_24h || 0) - (a.upbit.acc_trade_price_24h || 0));
-
-  const sortedCoinData = { upbit: {}, bybit: {} };
-
-  sortedData.forEach(({ ticker, upbit, bybit }) => {
-    sortedCoinData.upbit[ticker] = upbit;
-    sortedCoinData.bybit[ticker] = bybit;
-  });
-
-  socket.emit('initial', { source: 'initial', data: sortedCoinData, exchangeRate: exchangeRate.value });
-
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
-  });
-});
-
+// Socket.io를 활용한 암호화폐 데이터 처리
+require('./utils/crypto-io.js')(io, coinData, exchangeRate);
 
 // Socket.io를 활용한 채팅 기능 처리
-require('./utils/io.js')(io); // io를 인자로 넘겨준다.
+require('./utils/chat6ing-io.js')(io); // io를 인자로 넘겨준다.
 
 // 서버 시작
 server.listen(PORT, () => {
