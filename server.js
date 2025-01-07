@@ -86,7 +86,7 @@ const coinData = {
 require('./utils/crypto-io.js')(io, coinData, exchangeRate);
 
 // Socket.io를 활용한 채팅 기능 처리
-require('./utils/chat6ing-io.js')(io); // io를 인자로 넘겨준다.
+require('./utils/chatting-io.js')(io); // io를 인자로 넘겨준다.
 
 // 서버 시작
 server.listen(PORT, () => {
