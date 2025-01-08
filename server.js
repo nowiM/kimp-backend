@@ -4,6 +4,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const { createServer } = require('http'); // http 서버 생성
 const { Server } = require('socket.io'); // socket.io 서버 생성
+const sharp = require('sharp'); // 이미지 최적화
+const axios = require('axios'); // HTTP 요청 라이브러리
 
 // 업비트, 바이비트, 환율 관련 모듈 불러오기
 const connectUpbit = require('./websockets/upbit.js');
@@ -18,8 +20,7 @@ const PORT = process.env.PORT; // 포트 설정 (환경 변수 또는 기본값 
 // 미들웨어 설정
 app.use(helmet()); // 보안 강화
 app.use(cors({
-  //origin: /https:\/\/(www\.)?kimpviewer\.com$/, // CORS 문제 해결: trailing slash 제거
-  origin: process.env.CLIENT_URL,
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
   methods: ['GET', 'POST'],
 })); // CORS 설정
 
@@ -52,6 +53,32 @@ app.get('/api/globalMarketData', async (req, res) => {
     res.status(500).json({ error: '/api/globalMarketData Failed to fetch data' });
   }
 });
+
+// 이미지 프록시 서버 (이미지 최적화)
+app.get('/optimized-logo/:ticker', async (req, res) => {
+  const { ticker } = req.params;
+  const imageUrl = `https://static.upbit.com/logos/${ticker}.png`;
+
+  try {
+    const response = await axios({ url: imageUrl, responseType: 'arraybuffer' });
+    const optimizedImage = await sharp(response.data)
+      .resize(50, 50)
+      .webp({ quality: 70 })
+      .toBuffer();
+    
+    // CORS 헤더 추가
+    res.set('Access-Control-Allow-Origin', process.env.CLIENT_URL); // 허용된 클라이언트 URL
+    res.set('Access-Control-Allow-Methods', 'GET'); // 허용된 메서드
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin'); // 리소스를 cross-origin에서 허용
+
+    res.set('Content-Type', 'image/webp');
+    res.send(optimizedImage);
+  } catch (error) {
+    console.error(`[ERROR] Failed to process image for ticker: ${ticker}`, error.message);
+    res.status(500).send('Image optimization failed');
+  }
+});
+
 
 // http 서버와 Socket.io 서버를 통합하여 생성
 const server = createServer(app);
