@@ -55,30 +55,29 @@ app.get('/api/globalMarketData', async (req, res) => {
 });
 
 // 이미지 프록시 서버 (이미지 최적화)
-// app.get('/optimized-logo/:ticker', async (req, res) => {
-//   const { ticker } = req.params;
-//   const imageUrl = `https://static.upbit.com/logos/${ticker}.png`;
+app.get('/optimized-logo/:ticker', async (req, res) => {
+  const { ticker } = req.params;
+  const imageUrl = `https://static.upbit.com/logos/${ticker}.png`;
 
-//   try {
-//     const response = await axios({ url: imageUrl, responseType: 'arraybuffer' });
-//     const optimizedImage = await sharp(response.data)
-//       .resize(50, 50)
-//       .webp({ quality: 70 })
-//       .toBuffer();
+  try {
+    const response = await axios({ url: imageUrl, responseType: 'arraybuffer' });
+    const optimizedImage = await sharp(response.data)
+      .resize(50, 50)
+      .webp({ quality: 70 })
+      .toBuffer();
     
-//     // CORS 헤더 추가
-//     res.set('Access-Control-Allow-Origin', process.env.CLIENT_URL); // 허용된 클라이언트 URL
-//     res.set('Access-Control-Allow-Methods', 'GET'); // 허용된 메서드
-//     res.set('Cross-Origin-Resource-Policy', 'cross-origin'); // 리소스를 cross-origin에서 허용
+    // CORS 헤더 추가
+    res.set('Access-Control-Allow-Origin', process.env.CLIENT_URL); // 허용된 클라이언트 URL
+    res.set('Access-Control-Allow-Methods', 'GET'); // 허용된 메서드
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin'); // 리소스를 cross-origin에서 허용
 
-//     res.set('Content-Type', 'image/webp');
-//     res.send(optimizedImage);
-//   } catch (error) {
-//     console.error(`[ERROR] Failed to process image for ticker: ${ticker}`, error.message);
-//     res.status(500).send('Image optimization failed');
-//   }
-// });
-
+    res.set('Content-Type', 'image/webp');
+    res.send(optimizedImage);
+  } catch (error) {
+    console.error(`[ERROR] Failed to process image for ticker: ${ticker}`, error.message);
+    res.status(500).send('Image optimization failed');
+  }
+});
 
 // http 서버와 Socket.io 서버를 통합하여 생성
 const server = createServer(app);
