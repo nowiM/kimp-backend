@@ -17,12 +17,15 @@ const fetchBybitTickers = require('./api/fetch-bybit-tickers.js');
 const { fetchExchangeRate, updateExchangeRate } = require('./api/fetch-exchangeRate.js');
 
 const app = express(); // express 앱 생성
-const PORT = process.env.PORT || 8000; // 기본값 8000
+const PORT = process.env.PORT;
 
-// ✅ 미들웨어 설정
+// ✅ 환경 변수에서 CLIENT_URL 설정
+const CLIENT_URL = process.env.CLIENT_URL;
+
+// ✅ 미들웨어 설정 (CORS + 보안)
 app.use(helmet());
 app.use(cors({
-  origin: '*', // ✅ 모든 도메인에서 접근 가능하도록 설정 (필요 시 제한 가능)
+  origin: CLIENT_URL, // ✅ 특정 도메인만 허용
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
 }));
@@ -39,7 +42,7 @@ if (!fs.existsSync(IMAGE_CACHE_DIR)) {
 // ✅ 정적 파일 제공 (최적화된 WebP 제공)
 app.use('/cache', express.static(IMAGE_CACHE_DIR, {
     setHeaders: (res) => {
-        res.setHeader('Access-Control-Allow-Origin', '*'); // CORS 해결
+        res.setHeader('Access-Control-Allow-Origin', CLIENT_URL); // ✅ 특정 도메인만 허용
         res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); 
     }
 }));
@@ -50,10 +53,10 @@ app.get('/logo/:ticker', async (req, res) => {
     const imagePath = path.join(IMAGE_CACHE_DIR, `${ticker}.webp`); // ✅ WebP 파일로 저장
 
     try {
-        // ✅ 캐싱된 파일이 있으면 바로 제공
+        // ✅ 캐싱된 파일이 있으면 직접 반환
         if (fs.existsSync(imagePath)) {
             res.setHeader('Content-Type', 'image/webp');
-            res.setHeader('Access-Control-Allow-Origin', '*');
+            res.setHeader('Access-Control-Allow-Origin', CLIENT_URL);
             res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); 
             return res.sendFile(imagePath);
         }
@@ -74,11 +77,11 @@ app.get('/logo/:ticker', async (req, res) => {
 
         // ✅ WebP 이미지 제공
         res.setHeader('Content-Type', 'image/webp');
-        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Origin', CLIENT_URL);
         res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
         res.send(optimizedImage);
     } catch (error) {
-        // console.error(`Failed to fetch logo for ${ticker}:`, error.message);
+        console.error(`Failed to fetch logo for ${ticker}:`, error.message);
         res.status(500).json({ error: `Failed to fetch logo for ${ticker}` });
     }
 });
@@ -114,7 +117,7 @@ app.get('/api/globalMarketData', async (req, res) => {
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*', // ✅ CORS 문제 해결
+    origin: CLIENT_URL, // ✅ 특정 도메인만 허용
     methods: ['GET', 'POST'],
   },
 });
